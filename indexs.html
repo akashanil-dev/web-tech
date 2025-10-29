@@ -109,3 +109,43 @@ h2 {
 </section>
 </body>
 </html>
+
+<html>
+<head>
+<title>Login Form</title>
+</head>
+<body style="text-align:center;">
+
+<h2>Login Form</h2>
+
+<form id="loginform">
+
+<label>Username:</label><br>
+<input type="text" id="username" name="username"><br><br>
+<label>Password:</label><br>
+<input type="password" id="password" name="password"><br><br>
+<button type="button" onclick="formlogin()">Login</button>
+
+</form>
+
+<script>
+function formlogin() {
+var username = document.getElementById("username").value;
+var password = document.getElementById("password").value;
+
+
+if (username === "") {
+alert("Username is empty");
+} else if (password === "") {
+alert("Password is empty");
+} else if (password.length < 6) {
+alert("Password must be at least 6 characters");
+} else {
+alert("Login successful!");
+}
+}
+
+</script>
+
+</body>
+</html>
