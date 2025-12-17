@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Indian Cricket Squad</title>
+
+<style>
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#f5f7fa;
+  font-family:system-ui, Arial, sans-serif;
+  color:#222;
+}
+
+.wrapper{
+  background:#ffffff;
+  padding:24px;
+  border-radius:12px;
+  width:420px;
+  box-shadow:0 12px 30px rgba(0,0,0,0.1);
+}
+
+h2{
+  margin:0 0 18px;
+  text-align:center;
+  color:#1e3a8a;
+  letter-spacing:0.5px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:14px;
+}
+
+thead{
+  background:#1e3a8a;
+}
+
+th{
+  padding:10px;
+  text-align:left;
+  color:#ffffff;
+}
+
+td{
+  padding:10px;
+  border-bottom:1px solid #e5e7eb;
+}
+
+tbody tr:nth-child(even){
+  background:#f9fafb;
+}
+
+tbody tr:hover{
+  background:#eef2ff;
+}
+
+td:first-child{
+  text-align:center;
+  font-weight:bold;
+  color:#1e3a8a;
+  width:60px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+  <h2>Indian Cricket Squad</h2>
+
+<?php
+// Player list stored in an array
+$players = array(
+  "Rohit Sharma",
+  "Virat Kohli",
+  "Shubman Gill",
+  "KL Rahul",
+  "Ravindra Jadeja",
+  "Hardik Pandya",
+  "Jasprit Bumrah",
+  "Rishabh Pant",
+  "Mohammed Siraj",
+  "Kuldeep Yadav",
+  "Axar Patel"
+);
+
+// Display data in table format
+echo "<table>";
+echo "<thead><tr><th>S.No</th><th>Player Name</th></tr></thead>";
+echo "<tbody>";
+
+$slno = 1;
+foreach ($players as $player) {
+  echo "<tr>";
+  echo "<td>$slno</td>";
+  echo "<td>" . htmlspecialchars($player) . "</td>";
+  echo "</tr>";
+  $slno++;
+}
+
+echo "</tbody>";
+echo "</table>";
+?>
+
+</div>
+
+</body>
+</html>

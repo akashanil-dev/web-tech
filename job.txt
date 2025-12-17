@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Candidate Registration</title>
+
+<!-- jQuery CDN -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+body{
+  font-family: system-ui, Arial;
+  background: #f1f5f9; /* solid light background */
+  padding: 30px;
+  color: #0f172a;
+}
+
+.card{
+  max-width: 520px;
+  margin: auto;
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 18px 35px rgba(0,0,0,.15);
+}
+
+h2{
+  margin-top: 0;
+  text-align: center;
+  color: #1d4ed8;
+}
+
+.field{
+  margin-bottom: 16px;
+}
+
+label{
+  display: block;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #334155;
+}
+
+input, select{
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #0f172a;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+input:focus, select:focus{
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37,99,235,.2);
+}
+
+button{
+  width: 100%;
+  padding: 11px;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+button:hover{
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0,0,0,.15);
+}
+
+.error{
+  font-size: 13px;
+  color: #dc2626;
+  margin-top: 4px;
+}
+
+.success{
+  margin-top: 18px;
+  color: #16a34a;
+  text-align: center;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>Candidate Registration</h2>
+
+  <form id="regForm">
+
+    <div class="field">
+      <label>Applicant Name</label>
+      <input type="text" id="fullName">
+      <div class="error" id="errName"></div>
+    </div>
+
+    <div class="field">
+      <label>Email Address</label>
+      <input type="text" id="mail">
+      <div class="error" id="errMail"></div>
+    </div>
+
+    <div class="field">
+      <label>Country</label>
+      <select id="countrySel">
+        <option value="">Choose country</option>
+      </select>
+      <div class="error" id="errCountry"></div>
+    </div>
+
+    <div class="field">
+      <label>State</label>
+      <select id="stateSel">
+        <option value="">Choose state</option>
+      </select>
+      <div class="error" id="errState"></div>
+    </div>
+
+    <div class="field">
+      <label>District</label>
+      <select id="districtSel">
+        <option value="">Choose district</option>
+      </select>
+      <div class="error" id="errDistrict"></div>
+    </div>
+
+    <button type="submit">Register</button>
+  </form>
+
+  <div id="finalMsg" class="success"></div>
+</div>
+
+<script>
+// ---------------- DATA SOURCE ----------------
+const LOCATION_DATA = {
+  India: {
+    Kerala: ["Alappuzha","Thrissur","Kozhikode"],
+    Karnataka: ["Bengaluru","Mysuru","Mangaluru"]
+  },
+  Canada: {
+    Ontario: ["Toronto","Ottawa","Hamilton"],
+    Alberta: ["Calgary","Edmonton","Red Deer"]
+  }
+};
+
+// ---------------- INIT ----------------
+$(function(){
+
+  // Populate countries
+  $.each(LOCATION_DATA, function(country){
+    $("#countrySel").append(`<option value="${country}">${country}</option>`);
+  });
+
+  // Country → State
+  $("#countrySel").on("change", function(){
+    const country = $(this).val();
+    $("#stateSel").html(`<option value="">Choose state</option>`);
+    $("#districtSel").html(`<option value="">Choose district</option>`);
+
+    if(country){
+      $.each(LOCATION_DATA[country], function(state){
+        $("#stateSel").append(`<option value="${state}">${state}</option>`);
+      });
+    }
+  });
+
+  // State → District
+  $("#stateSel").on("change", function(){
+    const country = $("#countrySel").val();
+    const state = $(this).val();
+    $("#districtSel").html(`<option value="">Choose district</option>`);
+
+    if(state){
+      $.each(LOCATION_DATA[country][state], function(_, dist){
+        $("#districtSel").append(`<option value="${dist}">${dist}</option>`);
+      });
+    }
+  });
+
+  // ---------------- VALIDATION ----------------
+  $("#regForm").on("submit", function(e){
+    e.preventDefault();
+    let ok = true;
+    $(".error").text("");
+    $("#finalMsg").text("");
+
+    if($("#fullName").val().trim() === ""){
+      $("#errName").text("Name cannot be empty");
+      ok = false;
+    }
+
+    const mail = $("#mail").val().trim();
+    if(mail === "" || !mail.includes("@")){
+      $("#errMail").text("Invalid email format");
+      ok = false;
+    }
+
+    if($("#countrySel").val() === ""){
+      $("#errCountry").text("Select a country");
+      ok = false;
+    }
+
+    if($("#stateSel").val() === ""){
+      $("#errState").text("Select a state");
+      ok = false;
+    }
+
+    if($("#districtSel").val() === ""){
+      $("#errDistrict").text("Select a district");
+      ok = false;
+    }
+
+    if(ok){
+      $("#finalMsg").text("Registration completed successfully!");
+      $("#regForm")[0].reset();
+    }
+  });
+
+});
+</script></body></html>

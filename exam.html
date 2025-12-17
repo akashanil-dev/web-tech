@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Simple Exam</title>
+
+<style>
+body{
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background: linear-gradient(135deg, #e0f2fe, #fef3c7);
+  color: #0f172a;
+}
+
+.box{
+  background: #ffffff;
+  padding: 24px;
+  max-width: 600px;
+  margin: auto;
+  border-radius: 16px;
+  box-shadow: 0 20px 35px rgba(0,0,0,.15);
+}
+
+h2{
+  margin-top: 0;
+  color: #1d4ed8;
+}
+
+.options label{
+  display: block;
+  padding: 12px;
+  border: 2px solid #e5e7eb;
+  margin: 10px 0;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #f8fafc;
+  transition: all .2s ease;
+}
+
+.options label:hover{
+  background: #eff6ff;
+  border-color: #3b82f6;
+}
+
+input[type="radio"]{
+  accent-color: #2563eb;
+}
+
+.btns{
+  margin-top: 18px;
+  display: flex;
+  gap: 12px;
+}
+
+button{
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #ffffff;
+  font-weight: bold;
+  letter-spacing: .3px;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+button:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.15);
+}
+
+.prev{ background: #64748b; }
+.next{ background: #2563eb; }
+.submit{ background: #16a34a; }
+
+.prev:hover{ background: #475569; }
+.next:hover{ background: #1d4ed8; }
+.submit:hover{ background: #15803d; }
+
+#status{
+  margin-top: 14px;
+  color: #475569;
+  font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2 id="qTitle"></h2>
+  <p id="qText"></p>
+
+  <div id="options" class="options"></div>
+
+  <div class="btns">
+    <button class="prev" id="prevBtn">Previous</button>
+    <button class="next" id="nextBtn">Next</button>
+    <button class="submit" id="submitBtn">Submit</button>
+  </div>
+
+  <p id="status"></p>
+</div>
+
+<script>
+// ---------------- QUESTIONS ----------------
+const QUESTIONS = [
+  { q: "Which data structure follows FIFO principle?", options: ["Stack","Queue","Tree","Graph"], answer: 1 },
+  { q: "Which HTML tag is used to create a hyperlink?", options: ["<link>","<href>","<a>","<url>"], answer: 2 },
+  { q: "Which of the following is NOT an operating system?", options: ["Linux","Windows","Oracle","macOS"], answer: 2 },
+  { q: "Which command lists files in Linux?", options: ["cd","ls","mkdir","rm"], answer: 1 },
+  { q: "Which protocol is used for secure web browsing?", options: ["HTTP","FTP","SMTP","HTTPS"], answer: 3 }
+];
+
+let currentIndex = 0;
+const userAnswers = {};
+
+const qTitle = document.getElementById("qTitle");
+const qText = document.getElementById("qText");
+const optionsBox = document.getElementById("options");
+const status = document.getElementById("status");
+
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+const submitBtn = document.getElementById("submitBtn");
+
+function renderQuestion(){
+  const current = QUESTIONS[currentIndex];
+
+  qTitle.textContent = `Question ${currentIndex + 1}`;
+  qText.textContent = current.q;
+  optionsBox.innerHTML = "";
+
+  current.options.forEach((text, i) => {
+    const label = document.createElement("label");
+    const radio = document.createElement("input");
+
+    radio.type = "radio";
+    radio.name = "option";
+    radio.checked = userAnswers[currentIndex] === i;
+
+    radio.addEventListener("change", () => {
+      userAnswers[currentIndex] = i;
+    });
+
+    label.appendChild(radio);
+    label.append(" " + text);
+    optionsBox.appendChild(label);
+  });
+
+  status.textContent = `Question ${currentIndex + 1} of ${QUESTIONS.length}`;
+}
+
+function calculateScore(){
+  let score = 0;
+  QUESTIONS.forEach((q, i) => {
+    if (userAnswers[i] === q.answer) score++;
+  });
+  return score;
+}
+
+nextBtn.addEventListener("click", () => {
+  if (currentIndex < QUESTIONS.length - 1){
+    currentIndex++;
+    renderQuestion();
+  }
+});
+
+prevBtn.addEventListener("click", () => {
+  if (currentIndex > 0){
+    currentIndex--;
+    renderQuestion();
+  }
+});
+
+submitBtn.addEventListener("click", () => {
+  const score = calculateScore();
+  alert(`YOUR SCORE: ${score} / ${QUESTIONS.length}`);
+});
+
+renderQuestion();
+</script>
+
+</body>
+</html>
