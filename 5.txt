@@ -1,0 +1,8 @@
+list1 = [1, 2, 3]
+list2 = [3, 2, 1]
+
+print("Equal length:", len(list1) == len(list2))
+print("Equal sum:", sum(list1) == sum(list2))
+
+common = set(list1) & set(list2)
+print("Common values:", common)

@@ -1,0 +1,8 @@
+word = "programming"
+vowels = []
+
+for ch in word:
+    if ch in "aeiouAEIOU":
+        vowels.append(ch)
+
+print("Vowels:", vowels)
