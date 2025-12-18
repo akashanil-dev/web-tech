@@ -1,0 +1,48 @@
+class Time:
+    def __init__(self, hour, minute, second):
+        self.__hour = hour
+        self.__minute = minute
+        self.__second = second
+
+    def __add__(self, other):
+        sec = self.__second + other.__second
+        min = self.__minute + other.__minute
+        hr = self.__hour + other.__hour
+
+        if sec >= 60:
+            min += sec // 60
+            sec = sec % 60
+
+        if min >= 60:
+            hr += min // 60
+            min = min % 60
+
+        return Time(hr, min, sec)
+
+    def display(self):
+        print(f"{self.__hour:02d}:{self.__minute:02d}:{self.__second:02d}")
+
+
+h1 = int(input("Enter hours (time 1): "))
+m1 = int(input("Enter minutes (time 1): "))
+s1 = int(input("Enter seconds (time 1): "))
+
+t1 = Time(h1, m1, s1)
+
+
+h2 = int(input("\nEnter hours (time 2): "))
+m2 = int(input("Enter minutes (time 2): "))
+s2 = int(input("Enter seconds (time 2): "))
+
+t2 = Time(h2, m2, s2)
+
+
+t3 = t1 + t2
+
+
+print("\nTime 1:")
+t1.display()
+print("Time 2:")
+t2.display()
+print("Sum of Time:")
+t3.display()

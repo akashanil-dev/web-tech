@@ -1,0 +1,18 @@
+import csv
+data={
+    "id":[1,2,3],
+    "Name":["Dev","Bob","Das"],
+    "Age":[10,20,30]
+}
+
+filename="data.csv"
+with open(filename,'w',newline='') as file:
+    writer = csv.writer(file)
+    writer.writerow(data.keys())
+    writer.writerow(zip(*data.values()))
+
+print("Content of csv file:")
+with open(filename,'r') as file:
+    reader = csv.reader(file)
+    for row in reader:
+        print(row)

@@ -1,0 +1,9 @@
+def add_ing_ly(s):
+    if s.endswith("ing"):
+        return s + "ly"
+    else:
+        return s + "ing"
+
+string=input("enter string: ")
+result=add_ing_ly(string)
+print("Result: ",result)

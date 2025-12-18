@@ -1,0 +1,8 @@
+filename=input("Enter file name: ")
+lines_list = []
+with open(filename, 'r') as file:
+    for line in file:
+        lines_list.append(line.strip())
+
+print("lines stored in file:")
+print(lines_list)

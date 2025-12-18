@@ -1,0 +1,10 @@
+string=input("Enter a string: ")
+first_char=string[0];
+new_string=first_char
+for ch in string[1:]:
+    if ch==first_char:
+        new_string+="$"
+    else:
+        new_string+=ch
+
+print(new_string)

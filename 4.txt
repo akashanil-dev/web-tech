@@ -1,7 +1,5 @@
-names = ["Anil", "Akash", "Aarya", "Ravi"]
-count = 0
-
-for name in names:
-    count += name.lower().count('a')
-
-print("Total occurrences of 'a':", count)
+n = int(input("Number of names: "))
+names = [input(f"Enter name {i+1}: ") for i in range(n)]
+count = sum(name.lower().count('a') for name in names)
+print("List of names:", names)
+print("Total occurrences of letter 'a':", count)

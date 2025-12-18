@@ -1,0 +1,11 @@
+import csv
+filename=input("Enter csv file name: ")
+
+colums= [0,2]
+
+with open(filename,'r') as file:
+    reader = csv.reader(file)
+    for row in reader:
+        for i in colums:
+            print(row[i],end=" ")
+        print()

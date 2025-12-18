@@ -1,8 +1,4 @@
-word = "programming"
-vowels = []
-
-for ch in word:
-    if ch in "aeiouAEIOU":
-        vowels.append(ch)
-
-print("Vowels:", vowels)
+word = input("Enter a word: ")
+vowels = "aeiouAEIOU"
+vowel_list = [ch for ch in word if ch in vowels]
+print(vowel_list)

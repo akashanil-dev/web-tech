@@ -1,8 +1,31 @@
-list1 = [1, 2, 3]
-list2 = [3, 2, 1]
+firstList = []
+secondList = []
 
-print("Equal length:", len(list1) == len(list2))
-print("Equal sum:", sum(list1) == sum(list2))
+firstCount = int(input("Enter size of first list: "))
+for index in range(firstCount):
+    firstList.append(int(input("Enter value: ")))
 
-common = set(list1) & set(list2)
-print("Common values:", common)
+secondCount = int(input("Enter size of second list: "))
+for index in range(secondCount):
+    secondList.append(int(input("Enter value: ")))
+
+if len(firstList) == len(secondList):
+    print("Same length")
+else:
+    print("Different length")
+
+if sum(firstList) == sum(secondList):
+    print("Same sum")
+else:
+    print("Different sum")
+
+sharedValues = []
+
+for value in firstList:
+    if value in secondList and value not in sharedValues:
+        sharedValues.append(value)
+
+if sharedValues:
+    print("Common values:", sharedValues)
+else:
+    print("No common values")
