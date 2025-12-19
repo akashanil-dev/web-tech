@@ -1,4 +1,0 @@
-word = input("Enter a word: ")
-vowels = "aeiouAEIOU"
-vowel_list = [ch for ch in word if ch in vowels]
-print(vowel_list)

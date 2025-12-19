@@ -1,0 +1,75 @@
+#include <stdio.h>
+#define MAX 50
+
+int a[MAX], b[MAX];
+
+void merge(int low, int mid, int high)
+{
+    int h = low, i = low, j = mid + 1, k;
+    while (h <= mid && j <= high)
+    {
+        if (a[h] <= a[j])
+        {
+            b[i] = a[h];
+            h++;
+        }
+        else
+        {
+            b[i] = a[j];
+            j++;
+        }
+        i++;
+    }
+    if (h > mid)
+    {
+        for (k = j; k <= high; k++)
+        {
+            b[i] = a[k];
+            i++;
+        }
+    }
+    else
+    {
+        for (k = h; k <= mid; k++)
+        {
+            b[i] = a[k];
+            i++;
+        }
+    }
+    for (k = low; k <= high; k++)
+    {
+        a[k] = b[k];
+    }
+}
+
+void mergeSort(int low, int high)
+{
+    int mid;
+    if (low < high)
+    {
+        mid = (low + high) / 2;
+        mergeSort(low, mid);
+        mergeSort(mid + 1, high);
+        merge(low, mid, high);
+    }
+}
+
+int main()
+{
+    int n, i;
+    printf("Enter number of elements (<= %d): ", MAX);
+    scanf("%d", &n);
+    printf("Enter %d elements: ", n);
+    for (i = 0; i < n; i++)
+    {
+        scanf("%d", &a[i]);
+    }
+    mergeSort(0, n - 1);
+    printf("Sorted array: ");
+    for (i = 0; i < n; i++)
+    {
+        printf("%d ", a[i]);
+    }
+    printf("\n");
+    return 0;
+}

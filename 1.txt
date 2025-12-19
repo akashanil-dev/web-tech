@@ -1,8 +1,0 @@
-numbers = [-2, 5, -1, 8, 0, 3]
-positive = []
-
-for n in numbers:
-    if n > 0:
-        positive.append(n)
-
-print("Positive numbers:", positive)

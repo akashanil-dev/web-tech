@@ -1,0 +1,23 @@
+// To Implement a program to find sum and average of no's in an array
+
+#include <stdio.h>
+#define SIZE 3
+void main()
+{
+    int i, sum = 0;
+    float average;
+    int arr[SIZE];
+    for(i = 0; i < SIZE; i++)
+    {
+        printf("Enter values: ");
+        scanf("%d", &arr[i]);
+    }
+    
+    for(i = 0; i < SIZE; i++)
+    {
+        sum = sum + arr[i];
+    }
+    average = (float)sum/SIZE;
+    printf("Sum: %d\nAverage: %.2f", sum, average);
+
+}

@@ -1,0 +1,28 @@
+// To Implement a program to check whether a number is Palindrome or Not.
+
+#include <stdio.h>
+void main()
+{
+    int reversed = 0;
+    int duplicate, original, remainder;
+    printf("Input: ");
+    scanf("%d", &original);
+    
+    duplicate = original;
+    
+    while(duplicate != 0)
+    {
+        remainder = duplicate % 10;
+        reversed = reversed * 10 + remainder;
+        duplicate = duplicate/10;
+    }
+    
+    if (original == reversed)
+    {
+        printf("It's Palindrome");
+    }
+    else
+    {
+        printf("It's not Palindrome");
+    }
+}

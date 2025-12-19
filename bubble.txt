@@ -1,0 +1,31 @@
+#include <stdio.h>
+#define SIZE 5
+void main()
+{
+    int a[SIZE], i, j, temp;
+
+    printf("Input %d numbers: ", SIZE);
+    for (i = 0; i < SIZE; i++)
+    {
+        scanf("%d", &a[i]);
+    }
+
+    for (i = 0; i < SIZE - 1; i++)
+        {
+        for (j = 0; j < SIZE - 1 - i; j++)
+        {
+            if (a[j] > a[j+1])
+            {
+                temp = a[j];
+                a[j] = a[j+1];
+                a[j+1] = temp;
+            }
+        }
+    }
+
+    printf("Numbers in ascending order: ");
+    for (i = 0; i < SIZE; i++)
+    {
+        printf("%d ", a[i]);
+    }
+}

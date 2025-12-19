@@ -1,5 +1,0 @@
-n = int(input("Number of names: "))
-names = [input(f"Enter name {i+1}: ") for i in range(n)]
-count = sum(name.lower().count('a') for name in names)
-print("List of names:", names)
-print("Total occurrences of letter 'a':", count)

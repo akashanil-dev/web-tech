@@ -1,0 +1,26 @@
+#include <stdio.h>
+#define SIZE 5
+void main()
+{
+    int a[SIZE], key, i, found = 0;
+    printf("Enter %d numbers: ", SIZE);
+    for (i = 0; i < SIZE; i++)
+    {
+        scanf("%d", &a[i]);
+    }
+    printf("Enter number to search: ");
+    scanf("%d", &key);
+    for (i = 0; i < SIZE; i++)
+    {
+        if (a[i] == key)
+        {
+            printf("Found at index %d", i);
+            found = 1;
+            break;
+        }
+    }
+    if (found == 0)
+    {
+        printf("Number not found\n");
+    }
+}
