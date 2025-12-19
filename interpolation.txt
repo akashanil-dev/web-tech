@@ -1,6 +1,4 @@
 #include<stdio.h>
-
-
 void main()
 {
     int arr[15], x, low, high, pos, n, i, found = 0;
