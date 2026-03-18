@@ -1,16 +1,27 @@
-color_list1 = []
-color_list2 = []
+create table customer(cust_id int primary key,name varchar(100),city varchar(100),branch varchar(100),deposit decimal(10,2));
 
-n1 = int(input("Enter number of colors in first list: "))
-for i in range(n1):
-    color_list1.append(input("Enter color: "))
+insert into customer (cust_id,name,city,branch,deposit) values
+(1,'rahul','nagpur','nagpur',60000),
+(2,'neha','bombay','bombay',4000),
+(3,'arjun','pune','nagpur',5500),
+(4,'meera','nagpur','nagpur',30000),
+(5,'vishal','bombay','bombay',7000),
+(6,'kiran','delhi','delhi',50000),
+(7,'anita','kochi','kochi',20000),
+(8,'sanjay','kochi','kochi',15000);
 
-n2 = int(input("Enter number of colors in second list: "))
-for i in range(n2):
-    color_list2.append(input("Enter color: "))
+select branch,sum(deposit) as amount from customer group by branch having(sum(deposit)>50000);
 
-print("Colors present in color_list1 but not in color_list2:")
+select branch,sum(deposit) as amount from customer where city="bombay" group by branch having(sum(deposit)>5000);
 
-for color in color_list1:
-    if color not in color_list2:
-        print(color)
+select name from customer group by name,deposit having deposit=(select max(deposit) from customer);
+
+select name,avg(deposit) as avg from customer group by name,branch having avg(deposit)>5000;
+
+select branch,sum(deposit) as total_deposit from customer group by branch having sum(deposit) >= all (select sum(deposit) from customer group by branch);
+
+select count(deposit) from customer group by branch having branch='kochi';
+
+select city from customer group by city having count(branch) >= all (select count(branch) from customer group by city);
+
+select count(city) as number from customer where city=branch;

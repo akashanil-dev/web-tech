@@ -1,14 +1,223 @@
-str1 = input("Enter first string: ")
-str2 = input("Enter second string: ")
+1.
 
-list1 = list(str1)
-list2 = list(str2)
+create table students(id int primary KEY,rollno int(6),name varchar(20),branch varchar(20));
 
-list1[1], list2[1] = list2[1], list1[1]
+insert into students(id,Rollno,name,branch)values('1','20','Asif','MCA');
+insert into students(id,Rollno,name,branch)values('2','19','Arun','BCA');
+insert into students(id,Rollno,name,branch)values('3','60','Shyam','MCA');
+insert into students(id,Rollno,name,branch)values('4','12','Jishnu','MCA');
+insert into students(id,Rollno,name,branch)values('5','14','Anandhu','BCA');
 
-new_str1 = ''.join(list1)
-new_str2 = ''.join(list2)
+select * from students;
 
-result = new_str1 + " " + new_str2
+delete from students where id='4';
+alter table students drop branch;
+delete from students where id>0;
+drop table students;
 
-print("Resulting string:", result)
+-------
+
+2.
+
+create table class(id int primary key,usn int,name varchar(50),gender varchar(50),age int,mark int);
+
+insert into class(id,usn,name,gender,age,mark) values('1','210','rahul','male','20','78');
+insert into class(id,usn,name,gender,age,mark) values('2','211','neha','female','21','82');
+insert into class(id,usn,name,gender,age,mark) values('3','212','arun','male','23','91');
+insert into class(id,usn,name,gender,age,mark) values('4','213','meera','female','22','86');
+insert into class(id,usn,name,gender,age,mark) values('5','214','vishal','male','19','74');
+
+select * from class;
+select * from class where age=23;
+select * from class where age>20;
+select * from class where age<22;
+
+---------
+
+3.
+
+create table orders(orderid int primary key,customerid int,orderdate date,totalamount float(7,2),quantity int);
+
+insert into orders(orderid,customerid,orderdate,totalamount,quantity) values
+('1','201','2024-03-01','320.50','3'),
+('2','202','2024-03-05','450.00','4'),
+('3','203','2024-03-08','210.75','2'),
+('4','201','2024-03-10','600.25','5'),
+('5','204','2024-03-12','750.00','6'),
+('6','202','2024-03-15','390.00','3'),
+('7','203','2024-03-18','180.00','1');
+
+select * from orders;
+select count(*) as orderplaced from orders;
+select max(totalamount) as maxorder,min(totalamount) as minorder from orders;
+select avg(totalamount) as average from orders;
+select sum(totalamount) as total_revenue from orders;
+select sum(quantity) as total_quantity from orders;
+select count(distinct customerid) as numberofcustomers from orders;
+
+----------
+
+4.
+
+create table accounts(customerid int primary key,name varchar(100),branch varchar(100),acc_no varchar(100),balance decimal(8,2) check(balance>=500));
+
+insert into accounts(customerid,name,branch,acc_no,balance) values
+('1','nisha','kottayam','ACC501','6200.00'),
+('2','rahul','ernakulam','ACC502','2800.00'),
+('3','manoj','kottayam','ACC503','5400.00'),
+('4','deepak','trivandrum','ACC504','7200.00'),
+('5','anju','cochin','ACC505','3100.00'),
+('6','ajith','kottayam','ACC506','5600.00'),
+('7','elina','ernakulam','ACC507','1500.00');
+
+select * from accounts;
+
+select * from accounts where balance>=2000 and balance<=3000;
+select distinct(branch) as branches from accounts;
+select * from accounts where branch='kottayam' and balance>5000;
+select * from accounts where name like 'a%';
+alter table accounts rename column branch to city;
+select sum(balance) as total_balance from accounts;
+select avg(balance) as avg_balance from accounts;
+select max(balance) as max_amount from accounts;
+select min(balance) as min_balance from accounts;
+
+------------------
+
+5.
+
+create table students(rollno int primary key,name varchar(100),mark1 int check(mark1<=100),mark2 int check(mark2<=100),mark3 int check(mark3<=100),place varchar(100));
+
+insert into students(rollno,name,mark1,mark2,mark3,place) values
+('1','nisha','68','55','74','kottayam'),
+('2','rahul','88','72','91','ernakulam'),
+('3','meera','75','65','94','kottayam'),
+('4','arjun','84','96','97','kollam'),
+('5','anju','66','95','86','kollam'),
+('6','vishal','72','92','71','kottayam'),
+('7','elina','70','82','76','ernakulam');
+
+select * from students where mark3>80;
+select * from students where name like '_a%';
+delete from students where place='kollam';
+
+alter table students add teleno char(10);
+
+update students set teleno='2354222312' where rollno=1;
+update students set teleno='2357645323' where rollno=2;
+update students set teleno='2867546334' where rollno=3;
+update students set teleno='2387756354' where rollno=6;
+update students set teleno='2354346867' where rollno=7;
+
+select name,count(*) as total_students from students group by name;
+
+select rollno,name from students where not place='ernakulam';
+
+select * from students where mark1>=60 and mark1<80 and mark2>=60 and mark2<80 and mark3>=60 and mark3<80;
+
+select * from students order by name;
+
+select name,mark1,mark2,mark3,mark1+mark2+mark3 as total from students;
+
+select name,mark1,mark2,mark3,(mark1+mark2+mark3) as total from students where (mark1+mark2+mark3)/3>=80;
+
+----------
+
+6.
+
+create table employees(employee_id int primary key,first_name varchar(100),last_name varchar(100),hire_date date,salary decimal(8,2));
+
+insert into employees(employee_id,first_name,last_name,hire_date,salary) values
+('100','steven','king','1987-06-17','24000.00'),
+('101','neena','kochar','1989-09-21','17000.00'),
+('102','lex','de haan','1993-01-13','17000.00'),
+('103','alexander','hanold','1990-01-03','9000.00'),
+('104','bruce','ernest','1991-05-21','6000.00'),
+('105','david','austin','1997-06-25','4800.00'),
+('106','valli','pataballa','1998-02-05','4800.00'),
+('107','diana','lorentz','1999-02-07','4200.00'),
+('108','nancy','greenberg','1994-08-17','10000.00'),
+('109','daniel','faviet','1994-08-16','9000.00'),
+('110','john','chen','1997-09-28','8200.00');
+
+select * from employees order by first_name;
+select * from employees order by salary desc;
+select * from employees order by hire_date desc;
+
+------------
+
+7.
+
+create table employees_new(empid int primary key,deptno int not null,empname varchar(100) not null,salary decimal(10,2) not null,job varchar(50) not null,place varchar(100) not null,dob date not null);
+
+insert into employees_new(empid,deptno,empname,salary,job,place,dob) values
+('1','1','adam','12000','manager','trivandrum','1985-06-15'),
+('2','2','sarah','9000','developer','kollam','1990-04-25'),
+('3','1','daniel','15000','hr','ernakulam','1987-12-05'),
+('4','3','aaron','9500','analyst','kottayam','1993-09-17'),
+('5','4','steve','11000','clerk','trivandrum','1988-02-21'),
+('6','1','paul','13000','engineer','kottayam','1991-07-30'),
+('7','2','mark','8500','technician','cochin','1995-11-10');
+
+select * from employees_new;
+
+select * from employees_new where salary>10000;
+
+select empname from employees_new where empname like '_a%';
+
+delete from employees_new where place='kollam';
+
+alter table employees_new add teleno char(10);
+
+update employees_new set teleno='1234567895' where empid=1;
+update employees_new set teleno='1234567897' where empid=2;
+update employees_new set teleno='1234567898' where empid=3;
+update employees_new set teleno='1234567891' where empid=4;
+update employees_new set teleno='1234567892' where empid=5;
+update employees_new set teleno='1234567893' where empid=6;
+update employees_new set teleno='1234567894' where empid=7;
+
+select count(distinct salary) as employeetable from employees_new;
+
+select empname,place from employees_new where not place='trivandrum';
+
+select * from employees_new where place='trivandrum' or place='kottayam';
+
+select * from employees_new order by empname;
+
+select deptno as deptnumber,count(*) as number from employees_new group by deptno;
+
+select deptno as deptnumber,count(*) as number,avg(salary) as salary from employees_new group by deptno;
+
+-----------
+
+8.
+
+create table customer(cust_id int primary key,name varchar(100),city varchar(100),branch varchar(100),deposit decimal(10,2));
+
+insert into customer (cust_id,name,city,branch,deposit) values
+(1,'rahul','nagpur','nagpur',60000),
+(2,'neha','bombay','bombay',4000),
+(3,'arjun','pune','nagpur',5500),
+(4,'meera','nagpur','nagpur',30000),
+(5,'vishal','bombay','bombay',7000),
+(6,'kiran','delhi','delhi',50000),
+(7,'anita','kochi','kochi',20000),
+(8,'sanjay','kochi','kochi',15000);
+
+select branch,sum(deposit) as amount from customer group by branch having(sum(deposit)>50000);
+
+select branch,sum(deposit) as amount from customer where city="bombay" group by branch having(sum(deposit)>5000);
+
+select name from customer group by name,deposit having deposit=(select max(deposit) from customer);
+
+select name,avg(deposit) as avg from customer group by name,branch having avg(deposit)>5000;
+
+select branch,sum(deposit) as total_deposit from customer group by branch having sum(deposit) >= all (select sum(deposit) from customer group by branch);
+
+select count(deposit) from customer group by branch having branch='kochi';
+
+select city from customer group by city having count(branch) >= all (select count(branch) from customer group by city);
+
+select count(city) as number from customer where city=branch;
+

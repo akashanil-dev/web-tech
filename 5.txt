@@ -1,31 +1,34 @@
-firstList = []
-secondList = []
+create table students(rollno int primary key,name varchar(100),mark1 int check(mark1<=100),mark2 int check(mark2<=100),mark3 int check(mark3<=100),place varchar(100));
 
-firstCount = int(input("Enter size of first list: "))
-for index in range(firstCount):
-    firstList.append(int(input("Enter value: ")))
+insert into students(rollno,name,mark1,mark2,mark3,place) values
+('1','nisha','68','55','74','kottayam'),
+('2','rahul','88','72','91','ernakulam'),
+('3','meera','75','65','94','kottayam'),
+('4','arjun','84','96','97','kollam'),
+('5','anju','66','95','86','kollam'),
+('6','vishal','72','92','71','kottayam'),
+('7','elina','70','82','76','ernakulam');
 
-secondCount = int(input("Enter size of second list: "))
-for index in range(secondCount):
-    secondList.append(int(input("Enter value: ")))
+select * from students where mark3>80;
+select * from students where name like '_a%';
+delete from students where place='kollam';
 
-if len(firstList) == len(secondList):
-    print("Same length")
-else:
-    print("Different length")
+alter table students add teleno char(10);
 
-if sum(firstList) == sum(secondList):
-    print("Same sum")
-else:
-    print("Different sum")
+update students set teleno='2354222312' where rollno=1;
+update students set teleno='2357645323' where rollno=2;
+update students set teleno='2867546334' where rollno=3;
+update students set teleno='2387756354' where rollno=6;
+update students set teleno='2354346867' where rollno=7;
 
-sharedValues = []
+select name,count(*) as total_students from students group by name;
 
-for value in firstList:
-    if value in secondList and value not in sharedValues:
-        sharedValues.append(value)
+select rollno,name from students where not place='ernakulam';
 
-if sharedValues:
-    print("Common values:", sharedValues)
-else:
-    print("No common values")
+select * from students where mark1>=60 and mark1<80 and mark2>=60 and mark2<80 and mark3>=60 and mark3<80;
+
+select * from students order by name;
+
+select name,mark1,mark2,mark3,mark1+mark2+mark3 as total from students;
+
+select name,mark1,mark2,mark3,(mark1+mark2+mark3) as total from students where (mark1+mark2+mark3)/3>=80;

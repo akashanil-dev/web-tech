@@ -1,7 +1,40 @@
-string=input("Enter a string: ")
-if(len(string)>0):
-    new_string=string[-1]+string[1:-1]+string[0]
-else:
-    new_string=string
+create table employees_new(empid int primary key,deptno int not null,empname varchar(100) not null,salary decimal(10,2) not null,job varchar(50) not null,place varchar(100) not null,dob date not null);
 
-print(new_string)
+insert into employees_new(empid,deptno,empname,salary,job,place,dob) values
+('1','1','adam','12000','manager','trivandrum','1985-06-15'),
+('2','2','sarah','9000','developer','kollam','1990-04-25'),
+('3','1','daniel','15000','hr','ernakulam','1987-12-05'),
+('4','3','aaron','9500','analyst','kottayam','1993-09-17'),
+('5','4','steve','11000','clerk','trivandrum','1988-02-21'),
+('6','1','paul','13000','engineer','kottayam','1991-07-30'),
+('7','2','mark','8500','technician','cochin','1995-11-10');
+
+select * from employees_new;
+
+select * from employees_new where salary>10000;
+
+select empname from employees_new where empname like '_a%';
+
+delete from employees_new where place='kollam';
+
+alter table employees_new add teleno char(10);
+
+update employees_new set teleno='1234567895' where empid=1;
+update employees_new set teleno='1234567897' where empid=2;
+update employees_new set teleno='1234567898' where empid=3;
+update employees_new set teleno='1234567891' where empid=4;
+update employees_new set teleno='1234567892' where empid=5;
+update employees_new set teleno='1234567893' where empid=6;
+update employees_new set teleno='1234567894' where empid=7;
+
+select count(distinct salary) as employeetable from employees_new;
+
+select empname,place from employees_new where not place='trivandrum';
+
+select * from employees_new where place='trivandrum' or place='kottayam';
+
+select * from employees_new order by empname;
+
+select deptno as deptnumber,count(*) as number from employees_new group by deptno;
+
+select deptno as deptnumber,count(*) as number,avg(salary) as salary from employees_new group by deptno;

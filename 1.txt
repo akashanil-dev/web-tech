@@ -1,8 +1,14 @@
-numbers = [-2, 5, -1, 8, 0, 3]
-positive = []
+create table students(id int primary KEY,rollno int(6),name varchar(20),branch varchar(20));
 
-for n in numbers:
-    if n > 0:
-        positive.append(n)
+insert into students(id,Rollno,name,branch)values('1','20','Asif','MCA');
+insert into students(id,Rollno,name,branch)values('2','19','Arun','BCA');
+insert into students(id,Rollno,name,branch)values('3','60','Shyam','MCA');
+insert into students(id,Rollno,name,branch)values('4','12','Jishnu','MCA');
+insert into students(id,Rollno,name,branch)values('5','14','Anandhu','BCA');
 
-print("Positive numbers:", positive)
+select * from students;
+
+delete from students where id='4';
+alter table students drop branch;
+delete from students where id>0;
+drop table students;
