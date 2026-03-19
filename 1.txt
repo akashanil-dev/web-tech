@@ -11,4 +11,5 @@ select * from students;
 delete from students where id='4';
 alter table students drop branch;
 delete from students where id>0;
+alter table student modify column roll_no int(8);
 drop table students;
