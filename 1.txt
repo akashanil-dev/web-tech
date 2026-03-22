@@ -2,8 +2,8 @@
 
 # Configuration
 URL="http://129.159.228.210:8000"
-USERNAME="admin"
-PASSWORD="password123"
+USERNAME="the_user"
+PASSWORD="jj7*7hggfFHghjtGJh%GhfgfjyFJH%456"
 
 # 1. Login and extract token (requires 'jq')
 echo "Logging in..."
