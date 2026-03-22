@@ -1,15 +1,33 @@
-create table students(id int primary KEY,rollno int(6),name varchar(20),branch varchar(20));
+#!/bin/bash
 
-insert into students(id,Rollno,name,branch)values('1','20','Asif','MCA');
-insert into students(id,Rollno,name,branch)values('2','19','Arun','BCA');
-insert into students(id,Rollno,name,branch)values('3','60','Shyam','MCA');
-insert into students(id,Rollno,name,branch)values('4','12','Jishnu','MCA');
-insert into students(id,Rollno,name,branch)values('5','14','Anandhu','BCA');
+# Configuration
+URL="http://129.159.228.210:8000"
+USERNAME="admin"
+PASSWORD="password123"
 
-select * from students;
+# 1. Login and extract token (requires 'jq')
+echo "Logging in..."
+TOKEN=$(curl -s -X POST "$URL/login" \
+     -H "Content-Type: application/json" \
+     -d "{\"username\": \"$USERNAME\", \"password\": \"$PASSWORD\"}" | jq -r '.access_token')
 
-delete from students where id='4';
-alter table students drop branch;
-delete from students where id>0;
-alter table student modify column roll_no int(8);
-drop table students;
+if [ "$TOKEN" == "null" ]; then
+    echo "Login failed. Check your server or credentials."
+    exit 1
+fi
+
+echo "Connected! Type your message (Ctrl+C to quit)"
+
+# 2. Interactive Loop
+while true; do
+    echo -n "You > "
+    read USER_INPUT
+    
+    # Send request and parse reply
+    RESPONSE=$(curl -s -X POST "$URL/chat" \
+         -H "Authorization: Bearer $TOKEN" \
+         -H "Content-Type: application/json" \
+         -d "{\"message\": \"$USER_INPUT\"}" | jq -r '.reply')
+    
+    echo -e "AI  > $RESPONSE\n"
+done
