@@ -1,0 +1,142 @@
+import java.util.*;
+
+// Interface
+interface Shippable {
+    void ship();
+}
+
+// Superclass
+class Product {
+    String name;
+    double price;
+
+    Product(String name, double price) {
+        this.name = name;
+        this.price = price;
+    }
+
+    void applyDiscount() {
+        System.out.println("No discount applied");
+    }
+}
+
+// Subclass Electronics
+class Electronics extends Product implements Shippable {
+    Electronics(String name, double price) {
+        super(name, price);
+    }
+
+    @Override
+    void applyDiscount() {
+        double discountPrice = price * 0.9; // 10% discount
+        System.out.println(name + " after discount: ₹" + discountPrice);
+    }
+
+    public void ship() {
+        System.out.println(name + " shipped via courier");
+    }
+}
+
+// Subclass Clothing
+class Clothing extends Product implements Shippable {
+    Clothing(String name, double price) {
+        super(name, price);
+    }
+
+    @Override
+    void applyDiscount() {
+        double discountPrice = price * 0.8; // 20% discount
+        System.out.println(name + " after discount: ₹" + discountPrice);
+    }
+
+    public void ship() {
+        System.out.println(name + " shipped via postal service");
+    }
+}
+
+// Thread class
+class CartThread implements Runnable {
+    String customer;
+
+    CartThread(String customer) {
+        this.customer = customer;
+    }
+
+    public void run() {
+        System.out.println(customer + " is adding products to cart...");
+    }
+}
+
+// Main class
+public class ShoppingCart {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Product input - Electronics
+        System.out.print("Enter electronics product name: ");
+        String ename = sc.nextLine();
+        System.out.print("Enter price: ");
+        double eprice = sc.nextDouble();
+        sc.nextLine(); // clear buffer
+
+        Electronics e = new Electronics(ename, eprice);
+        e.applyDiscount();
+        e.ship();
+
+        // Product input - Clothing
+        System.out.print("\nEnter clothing product name: ");
+        String cname = sc.nextLine();
+        System.out.print("Enter price: ");
+        double cprice = sc.nextDouble();
+        sc.nextLine(); // clear buffer
+
+        Clothing c = new Clothing(cname, cprice);
+        c.applyDiscount();
+        c.ship();
+
+        // Array of product names
+        System.out.print("\nEnter number of products to inventory: ");
+        int n = sc.nextInt();
+        sc.nextLine();
+
+        String[] products = new String[n];
+        for (int i = 0; i < n; i++) {
+            System.out.print("Enter product name: ");
+            products[i] = sc.nextLine();
+        }
+
+        // Search product
+        System.out.print("\nEnter product to search: ");
+        String search = sc.nextLine();
+        boolean found = false;
+        for (String p : products) {
+            if (p.equalsIgnoreCase(search)) {
+                System.out.println("Product found: " + p);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            System.out.println("Product not found");
+        }
+
+        // Threads for customers
+        System.out.print("\nEnter number of customers adding to cart: ");
+        int count = sc.nextInt();
+        sc.nextLine();
+
+        String[] customers = new String[count];
+        for (int i = 0; i < count; i++) {
+            System.out.print("Enter customer name: ");
+            customers[i] = sc.nextLine();
+        }
+
+        System.out.println("\n--- Customers Adding to Cart ---");
+        for (int i = 0; i < count; i++) {
+            Thread t = new Thread(new CartThread(customers[i]));
+            t.start();
+        }
+
+        sc.close();
+    }
+}

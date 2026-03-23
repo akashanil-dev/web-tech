@@ -1,0 +1,117 @@
+import java.util.*;
+
+// Interface
+interface Evaluatable {
+    void evaluate();
+}
+
+// Superclass
+class Course {
+    String name;
+
+    Course(String name) {
+        this.name = name;
+    }
+
+    void getDuration() {
+        System.out.println("Course duration not specified");
+    }
+}
+
+// Subclass OnlineCourse
+class OnlineCourse extends Course implements Evaluatable {
+    OnlineCourse(String name) {
+        super(name);
+    }
+
+    @Override
+    void getDuration() {
+        System.out.println(name + " Online Course duration = 3 months");
+    }
+
+    public void evaluate() {
+        System.out.println(name + " evaluated online");
+    }
+}
+
+// Subclass OfflineCourse
+class OfflineCourse extends Course implements Evaluatable {
+    OfflineCourse(String name) {
+        super(name);
+    }
+
+    @Override
+    void getDuration() {
+        System.out.println(name + " Offline Course duration = 6 months");
+    }
+
+    public void evaluate() {
+        System.out.println(name + " evaluated offline");
+    }
+}
+
+// Simple class instead of inner class (PDF style)
+class Assignment {
+    void submit(String student) {
+        System.out.println("Assignment submitted by: " + student);
+    }
+}
+
+// Thread class
+class SubmissionThread implements Runnable {
+    String student;
+
+    SubmissionThread(String student) {
+        this.student = student;
+    }
+
+    public void run() {
+        System.out.println(student + " is submitting assignment...");
+    }
+}
+
+// Main class
+public class CourseSystem {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Course objects
+        System.out.print("Enter online course name: ");
+        String oname = sc.nextLine();
+        OnlineCourse oc = new OnlineCourse(oname);
+        oc.getDuration();
+        oc.evaluate();
+
+        System.out.print("\nEnter offline course name: ");
+        String fname = sc.nextLine();
+        OfflineCourse fc = new OfflineCourse(fname);
+        fc.getDuration();
+        fc.evaluate();
+
+        // Array of students
+        System.out.print("\nEnter number of students: ");
+        int n = sc.nextInt();
+        sc.nextLine();
+
+        String[] students = new String[n];
+        for (int i = 0; i < n; i++) {
+            System.out.print("Enter student name: ");
+            students[i] = sc.nextLine();
+        }
+
+        // Assignment (normal class)
+        Assignment a = new Assignment();
+        System.out.print("\nEnter student name for submission: ");
+        String sname = sc.nextLine();
+        a.submit(sname);
+
+        // Threads
+        System.out.println("\n--- Assignment Submission Threads ---");
+        for (int i = 0; i < n; i++) {
+            Thread t = new Thread(new SubmissionThread(students[i]));
+            t.start();
+        }
+
+        sc.close();
+    }
+}

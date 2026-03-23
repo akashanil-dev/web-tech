@@ -1,0 +1,98 @@
+import java.util.*;
+
+// Interface
+interface Cancellable {
+    void cancelTicket();
+}
+
+// Superclass
+class Flight {
+    void calculateFare() {
+        System.out.println("Base fare");
+    }
+}
+
+// Subclass DomesticFlight
+class DomesticFlight extends Flight implements Cancellable {
+    @Override
+    void calculateFare() {
+        System.out.println("Domestic Flight fare = ₹3000");
+    }
+
+    public void cancelTicket() {
+        System.out.println("Domestic flight ticket cancelled");
+    }
+}
+
+// Subclass InternationalFlight
+class InternationalFlight extends Flight implements Cancellable {
+    @Override
+    void calculateFare() {
+        System.out.println("International Flight fare = ₹15000");
+    }
+
+    public void cancelTicket() {
+        System.out.println("International flight ticket cancelled");
+    }
+}
+
+// Simple class instead of inner class (PDF style)
+class Crew {
+    void showCrew() {
+        System.out.println("Crew members assigned");
+    }
+}
+
+// Thread class
+class BookingThread implements Runnable {
+    String passenger;
+
+    BookingThread(String passenger) {
+        this.passenger = passenger;
+    }
+
+    public void run() {
+        System.out.println(passenger + " is booking a ticket...");
+    }
+}
+
+// Main class
+public class AirlineSystem {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Flight objects
+        DomesticFlight df = new DomesticFlight();
+        InternationalFlight inf = new InternationalFlight();
+
+        df.calculateFare();
+        inf.calculateFare();
+
+        df.cancelTicket();
+        inf.cancelTicket();
+
+        // Passenger array
+        System.out.print("\nEnter number of passengers: ");
+        int n = sc.nextInt();
+        sc.nextLine();
+
+        String[] passengers = new String[n];
+        for (int i = 0; i < n; i++) {
+            System.out.print("Enter passenger name: ");
+            passengers[i] = sc.nextLine();
+        }
+
+        // Crew (normal class)
+        Crew c = new Crew();
+        c.showCrew();
+
+        // Threads
+        System.out.println("\n--- Ticket Booking Threads ---");
+        for (int i = 0; i < n; i++) {
+            Thread t = new Thread(new BookingThread(passengers[i]));
+            t.start();
+        }
+
+        sc.close();
+    }
+}

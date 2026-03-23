@@ -1,0 +1,139 @@
+import java.util.*;
+
+// Interface
+interface Downloadable {
+    void download();
+}
+
+// Superclass
+class Book {
+    String title;
+
+    Book(String title) {
+        this.title = title;
+    }
+
+    void getAvailability() {
+        System.out.println("Book availability unknown");
+    }
+}
+
+// Subclass DigitalBook
+class DigitalBook extends Book implements Downloadable {
+    DigitalBook(String title) {
+        super(title);
+    }
+
+    @Override
+    void getAvailability() {
+        System.out.println(title + " is available online");
+    }
+
+    public void download() {
+        System.out.println(title + " downloaded successfully");
+    }
+}
+
+// Subclass PrintedBook
+class PrintedBook extends Book {
+    PrintedBook(String title) {
+        super(title);
+    }
+
+    @Override
+    void getAvailability() {
+        System.out.println(title + " is available in library");
+    }
+}
+
+// Simple class instead of inner class (following PDF style)
+class Membership {
+    void issueBook(String user) {
+        System.out.println("Book issued to: " + user);
+    }
+}
+
+// Thread class
+class IssueThread implements Runnable {
+    String user;
+
+    IssueThread(String user) {
+        this.user = user;
+    }
+
+    public void run() {
+        System.out.println(user + " is issuing a book...");
+    }
+}
+
+// Main class
+public class LibrarySystem {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Book objects
+        System.out.print("Enter digital book title: ");
+        String dtitle = sc.nextLine();
+        DigitalBook db = new DigitalBook(dtitle);
+        db.getAvailability();
+        db.download();
+
+        System.out.print("\nEnter printed book title: ");
+        String ptitle = sc.nextLine();
+        PrintedBook pb = new PrintedBook(ptitle);
+        pb.getAvailability();
+
+        // Array of book titles
+        System.out.print("\nEnter number of books: ");
+        int n = sc.nextInt();
+        sc.nextLine();
+
+        String[] books = new String[n];
+        for (int i = 0; i < n; i++) {
+            System.out.print("Enter book title: ");
+            books[i] = sc.nextLine();
+        }
+
+        // Search
+        System.out.print("Enter book to search: ");
+        String search = sc.nextLine();
+        boolean found = false;
+
+        for (String b : books) {
+            if (b.equalsIgnoreCase(search)) {
+                System.out.println("Book found: " + b);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            System.out.println("Book not found");
+        }
+
+        // Membership (normal class)
+        Membership m = new Membership();
+        System.out.print("\nEnter user name for issuing book: ");
+        String user = sc.nextLine();
+        m.issueBook(user);
+
+        // Threads
+        System.out.print("\nEnter number of users: ");
+        int count = sc.nextInt();
+        sc.nextLine();
+
+        String[] users = new String[count];
+        for (int i = 0; i < count; i++) {
+            System.out.print("Enter user name: ");
+            users[i] = sc.nextLine();
+        }
+
+        System.out.println("\n--- Book Issuing Threads ---");
+        for (int i = 0; i < count; i++) {
+            Thread t = new Thread(new IssueThread(users[i]));
+            t.start();
+        }
+
+        sc.close();
+    }
+}

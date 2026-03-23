@@ -1,0 +1,114 @@
+import java.util.*;
+
+// Interface
+interface Taxable {
+    void calculateTax();
+}
+
+// Abstract class
+abstract class Employee {
+    String name;
+
+    Employee(String name) {
+        this.name = name;
+    }
+
+    abstract void calculateSalary();
+}
+
+// Subclass Manager
+class Manager extends Employee implements Taxable {
+    Manager(String name) {
+        super(name);
+    }
+
+    void calculateSalary() {
+        System.out.println(name + " Manager salary = ₹50000");
+    }
+
+    public void calculateTax() {
+        System.out.println(name + " Tax calculated for Manager");
+    }
+}
+
+// Subclass Developer
+class Developer extends Employee implements Taxable {
+    Developer(String name) {
+        super(name);
+    }
+
+    void calculateSalary() {
+        System.out.println(name + " Developer salary = ₹30000");
+    }
+
+    public void calculateTax() {
+        System.out.println(name + " Tax calculated for Developer");
+    }
+}
+
+// Simple class instead of inner class (PDF style)
+class Payslip {
+    void generateSlip(String name) {
+        System.out.println("Payslip generated for: " + name);
+    }
+}
+
+// Thread class
+class SalaryThread implements Runnable {
+    String employee;
+
+    SalaryThread(String employee) {
+        this.employee = employee;
+    }
+
+    public void run() {
+        System.out.println(employee + " is receiving salary...");
+    }
+}
+
+// Main class
+public class EmployeeSystem {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Manager
+        System.out.print("Enter manager name: ");
+        String mname = sc.nextLine();
+        Manager m = new Manager(mname);
+        m.calculateSalary();
+        m.calculateTax();
+
+        // Developer
+        System.out.print("\nEnter developer name: ");
+        String dname = sc.nextLine();
+        Developer d = new Developer(dname);
+        d.calculateSalary();
+        d.calculateTax();
+
+        // Array of employees
+        System.out.print("\nEnter number of employees: ");
+        int n = sc.nextInt();
+        sc.nextLine();
+
+        String[] employees = new String[n];
+        for (int i = 0; i < n; i++) {
+            System.out.print("Enter employee name: ");
+            employees[i] = sc.nextLine();
+        }
+
+        // Payslip (normal class)
+        Payslip p = new Payslip();
+        System.out.print("\nEnter employee name for payslip: ");
+        String ename = sc.nextLine();
+        p.generateSlip(ename);
+
+        // Threads
+        System.out.println("\n--- Salary Threads ---");
+        for (int i = 0; i < n; i++) {
+            Thread t = new Thread(new SalaryThread(employees[i]));
+            t.start();
+        }
+
+        sc.close();
+    }
+}
