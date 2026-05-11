@@ -1,114 +1,156 @@
-import java.util.*;
-
-// Interface
-interface Schedulable {
-    void setSchedule();
+5 – Library Book Management System
+import java.util.Scanner;
+abstract class LibraryItem {
+    String title;
+    abstract void display();
 }
-
-// Superclass
-class Vehicle {
-    void calculateFare() {
-        System.out.println("Base fare");
+class InvalidIssueException extends Exception {
+    public InvalidIssueException(String msg) {
+        super(msg);
     }
 }
+class Book extends LibraryItem {
+    private int bookId;
+    protected String author;
+    boolean available = true;
 
-// Subclass Bus
-class Bus extends Vehicle implements Schedulable {
+    Book() {}
+
+    Book(int id, String title, String author) {
+        this.bookId = id;
+        this.title = title;
+        this.author = author;
+    }
+
+    void search(String title) {
+        if (this.title.equalsIgnoreCase(title))
+            System.out.println("Book Found by Title: " + title);
+    }
+
+    void searchByAuthor(String author) {
+        if (this.author.equalsIgnoreCase(author))
+            System.out.println("Book Found by Author: " + author);
+    }
+
+    void issueBook() throws InvalidIssueException {
+        if (!available)
+            throw new InvalidIssueException("Book already issued");
+        available = false;
+    }
+
+    void returnBook() {
+        available = true;
+    }
+
+    static class LibraryRules {
+        static void showRules() {
+            System.out.println("Rule: Return book within 7 days.");
+        }
+    }
+
+    public void display() {
+        System.out.println("ID: " + bookId + ", Title: " + title + ", Author: " + author);
+    }
+}
+class PrintedBook extends Book {
+
+    PrintedBook(int id, String title, String author) {
+        super(id, title, author);
+    }
+
     @Override
-    void calculateFare() {
-        System.out.println("Bus fare = ₹50");
-    }
-
-    public void setSchedule() {
-        System.out.println("Bus schedule set");
+    public void display() {
+        System.out.println("Printed Book:");
+        super.display();
     }
 }
+class DigitalBook extends Book {
 
-// Subclass Train
-class Train extends Vehicle implements Schedulable {
+    DigitalBook(int id, String title, String author) {
+        super(id, title, author);
+    }
+
     @Override
-    void calculateFare() {
-        System.out.println("Train fare = ₹100");
-    }
-
-    public void setSchedule() {
-        System.out.println("Train schedule set");
+    public void display() {
+        System.out.println("Digital Book:");
+        super.display();
     }
 }
+class IssueThread extends Thread {
+    String data;
 
-// Simple Booking class
-class Ticket {
-    void bookTicket(String passenger) {
-        System.out.println("Ticket booked for: " + passenger);
-    }
-}
-
-// Thread class using Runnable
-class BookingThread implements Runnable {
-    String passenger;
-
-    BookingThread(String passenger) {
-        this.passenger = passenger;
+    IssueThread(String data) {
+        this.data = data;
     }
 
     public void run() {
-        System.out.println(passenger + " is booking ticket...");
+        System.out.println("Processing Issue...");
+        try {
+            java.io.FileWriter fw = new java.io.FileWriter("library.txt", true);
+            fw.write(data + "\n");
+            fw.close();
+            System.out.println("Issue saved to file.");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 }
-
-// Main class
-public class pg1 {
+class ReturnThread extends Thread {
+    public void run() {
+        System.out.println("Processing Return...");
+    }
+}
+public class MainApp {
     public static void main(String[] args) {
+
         Scanner sc = new Scanner(System.in);
 
-        // Objects
-        Bus bus = new Bus();
-        Train train = new Train();
+        try {
+            Book[] books = new Book[2];
 
-        bus.calculateFare();
-        train.calculateFare();
-        bus.setSchedule();
-        train.setSchedule();
+            for (int i = 0; i < 2; i++) {
+                System.out.print("Enter Book ID: ");
+                int id = sc.nextInt();
+                sc.nextLine();
 
-        // Passenger input
-        System.out.print("\nEnter number of passengers: ");
-        int n = sc.nextInt();
-        sc.nextLine();
+                System.out.print("Enter Title: ");
+                String title = sc.nextLine();
 
-        String[] passengers = new String[n];
-        for (int i = 0; i < n; i++) {
-            System.out.print("Enter passenger name: ");
-            passengers[i] = sc.nextLine();
-        }
+                System.out.print("Enter Author: ");
+                String author = sc.nextLine();
 
-        // Search
-        System.out.print("\nEnter name to search: ");
-        String search = sc.nextLine();
-        boolean found = false;
-        for (String p : passengers) {
-            if (p.equalsIgnoreCase(search)) {
-                System.out.println("Passenger found: " + p);
-                found = true;
-                break;
+                System.out.print("Type (1-Printed, 2-Digital): ");
+                int type = sc.nextInt();
+
+                if (type == 1)
+                    books[i] = new PrintedBook(id, title, author);
+                else
+                    books[i] = new DigitalBook(id, title, author);
             }
-        }
-        if (!found) {
-            System.out.println("Passenger not found");
-        }
 
-        // Ticket booking
-        Ticket ticket = new Ticket();
-        System.out.print("\nEnter passenger name for booking: ");
-        String name = sc.nextLine();
-        ticket.bookTicket(name);
+            sc.nextLine();
+            System.out.print("Search by title: ");
+            String searchTitle = sc.nextLine();
 
-        // Threads
-        System.out.println("\n--- Booking Threads ---");
-        for (int i = 0; i < n; i++) {
-            Thread t = new Thread(new BookingThread(passengers[i]));
-            t.start();
+            for (Book b : books)
+                b.search(searchTitle);
+
+            books[0].issueBook();
+
+            String report = "Issued Book: " + books[0].title;
+
+            books[0].display();
+
+            Book.LibraryRules.showRules();
+
+            IssueThread t1 = new IssueThread(report);
+            ReturnThread t2 = new ReturnThread();
+
+            t1.start();
+            t2.start();
+
+        } catch (InvalidIssueException e) {
+            System.out.println(e.getMessage());
         }
-
-        sc.close();
     }
 }

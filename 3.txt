@@ -1,39 +1,155 @@
-$URL = "http://129.159.228.210:8000"
-$Username = "the_user"
-$Password = "jj7*7hggfFHghjtGJh%GhfgfjyFJH%456"
-
-Write-Host "Logging in..." -ForegroundColor Cyan
-
-# 1. Login to get Token
-$LoginBody = @{ username = $Username; password = $Password } | ConvertTo-Json
-try {
-    $LoginResponse = Invoke-RestMethod -Method Post -Uri "$URL/login" -ContentType "application/json" -Body $LoginBody
-    $Token = $LoginResponse.access_token
-} catch {
-    Write-Host "Login failed! Check your server IP or credentials." -ForegroundColor Red
-    exit
+3 – Hospital Patient Monitoring System
+import java.util.Scanner;
+abstract class HospitalMember {
+    String name;
+    abstract void display();
 }
+class InvalidDataException extends Exception {
+    public InvalidDataException(String msg) {
+        super(msg);
+    }
+}
+class Patient extends HospitalMember {
+    private int id;
+    protected int age;
+    String disease;
+    double bill;
 
-Write-Host "Connected! Type your message. Commands: /clear (reset history), exit (quit)" -ForegroundColor Green
+    Patient() {}
 
-# 2. Interactive Loop
-while ($true) {
-    $userInput = Read-Host "You"
-    
-    if ($userInput -eq "exit") { break }
-
-    if ($userInput -eq "/clear") {
-        Invoke-RestMethod -Method Post -Uri "$URL/clear" -Headers @{ Authorization = "Bearer $Token" }
-        Write-Host "AI  > [History Cleared]" -ForegroundColor Yellow
-        continue
+    Patient(int id, String name, int age, String disease) throws InvalidDataException {
+        if (age <= 0) throw new InvalidDataException("Invalid Age");
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.disease = disease;
     }
 
-    # Send message to AI
-    $ChatBody = @{ message = $userInput } | ConvertTo-Json
-    try {
-        $ChatResponse = Invoke-RestMethod -Method Post -Uri "$URL/chat" -Headers @{ Authorization = "Bearer $Token" } -ContentType "application/json" -Body $ChatBody
-        Write-Host "AI  > $($ChatResponse.reply)`n" -ForegroundColor Cyan
-    } catch {
-        Write-Host "AI  > Error connecting to server.`n" -ForegroundColor Red
+    double calculateBill(double consultation) {
+        bill = consultation;
+        return bill;
+    }
+
+    double calculateBill(double consultation, double medicine) {
+        bill = consultation + medicine;
+        return bill;
+    }
+
+    class MedicalReport {
+        String report;
+
+        void generate() {
+            report = "Patient: " + name + ", Disease: " + disease + ", Bill: " + bill;
+        }
+
+        String getReport() {
+            return report;
+        }
+    }
+
+    public void display() {
+        System.out.println("ID: " + id + ", Name: " + name + ", Age: " + age + ", Disease: " + disease);
+    }
+}
+class InPatient extends Patient {
+
+    InPatient(int id, String name, int age, String disease) throws InvalidDataException {
+        super(id, name, age, disease);
+    }
+
+    @Override
+    double calculateBill(double consultation, double medicine) {
+        double roomCharge = 500;
+        bill = consultation + medicine + roomCharge;
+        return bill;
+    }
+}
+class BillThread extends Thread {
+    String data;
+
+    BillThread(String data) {
+        this.data = data;
+    }
+
+    public void run() {
+        System.out.println("Generating Bill...");
+        try {
+            java.io.FileWriter fw = new java.io.FileWriter("patients.txt", true);
+            fw.write(data + "\n");
+            fw.close();
+            System.out.println("Bill saved to file.");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+}
+class MonitorThread extends Thread {
+    public void run() {
+        System.out.println("Monitoring patient...");
+    }
+}
+public class MainApp {
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        try {
+            System.out.print("Enter Patient ID: ");
+            int id = sc.nextInt();
+            sc.nextLine();
+
+            System.out.print("Enter Name: ");
+            String name = sc.nextLine();
+
+            System.out.print("Enter Age: ");
+            int age = sc.nextInt();
+            sc.nextLine();
+
+            System.out.print("Enter Disease: ");
+            String disease = sc.nextLine();
+
+            System.out.print("Type (1-OutPatient, 2-InPatient): ");
+            int type = sc.nextInt();
+
+            Patient p;
+
+            if (type == 2)
+                p = new InPatient(id, name, age, disease);
+            else
+                p = new Patient(id, name, age, disease);
+
+            System.out.print("Enter Consultation Fee: ");
+            double c = sc.nextDouble();
+
+            System.out.print("Add Medicine? (1-Yes, 0-No): ");
+            int choice = sc.nextInt();
+
+            double total;
+
+            if (choice == 1) {
+                System.out.print("Enter Medicine Cost: ");
+                double m = sc.nextDouble();
+                total = p.calculateBill(c, m);
+            } else {
+                total = p.calculateBill(c);
+            }
+
+            if (total < 0) throw new InvalidDataException("Invalid Bill");
+
+            Patient.MedicalReport mr = p.new MedicalReport();
+            mr.generate();
+
+            p.display();
+            System.out.println("Prescription: " + mr.getReport());
+
+            BillThread t1 = new BillThread(mr.getReport());
+            MonitorThread t2 = new MonitorThread();
+
+            t1.start();
+            t2.start();
+
+        } catch (InvalidDataException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

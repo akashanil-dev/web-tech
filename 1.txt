@@ -1,33 +1,189 @@
-#!/bin/bash
+1 – Smart Student Record Management System
+import java.util.Scanner;
+abstract class Person {
+    protected String name;
 
-# Configuration
-URL="http://129.159.228.210:8000"
-USERNAME="the_user"
-PASSWORD="jj7*7hggfFHghjtGJh%GhfgfjyFJH%456"
+    abstract void display();
+}
+class InvalidMarkException extends Exception {
+    public InvalidMarkException(String msg) {
+        super(msg);
+    }
+}
+class Student extends Person {
+    private int studentId;
+    protected String department;
+    private int total;
 
-# 1. Login and extract token (requires 'jq')
-echo "Logging in..."
-TOKEN=$(curl -s -X POST "$URL/login" \
-     -H "Content-Type: application/json" \
-     -d "{\"username\": \"$USERNAME\", \"password\": \"$PASSWORD\"}" | jq -r '.access_token')
-
-if [ "$TOKEN" == "null" ]; then
-    echo "Login failed. Check your server or credentials."
-    exit 1
-fi
-
-echo "Connected! Type your message (Ctrl+C to quit)"
-
-# 2. Interactive Loop
-while true; do
-    echo -n "You > "
-    read USER_INPUT
     
-    # Send request and parse reply
-    RESPONSE=$(curl -s -X POST "$URL/chat" \
-         -H "Authorization: Bearer $TOKEN" \
-         -H "Content-Type: application/json" \
-         -d "{\"message\": \"$USER_INPUT\"}" | jq -r '.reply')
+    Student() {
+        studentId = 0;
+        name = "Unknown";
+        department = "None";
+    }
+
+   
+    Student(int id, String name, String dept) {
+        this.studentId = id;
+        this.name = name;
+        this.department = dept;
+    }
+
+   
+    int calculateTotal(int m1, int m2, int m3) {
+        total = m1 + m2 + m3;
+        return total;
+    }
+
+    int calculateTotal(int m1, int m2, int m3, int m4, int m5) {
+        total = m1 + m2 + m3 + m4 + m5;
+        return total;
+    }
+
     
-    echo -e "AI  > $RESPONSE\n"
-done
+    class Result {
+        String grade;
+        String status;
+
+        void calculateResult() {
+            if (total >= 250) {
+                grade = "A";
+                status = "Pass";
+            } else if (total >= 150) {
+                grade = "B";
+                status = "Pass";
+            } else {
+                grade = "C";
+                status = "Fail";
+            }
+        }
+
+        String getResult() {
+            return "Grade: " + grade + ", Status: " + status;
+        }
+    }
+
+   
+    @Override
+    public void display() {
+        System.out.println("ID: " + studentId + ", Name: " + name + ", Dept: " + department);
+    }
+
+    public int getTotal() {
+        return total;
+    }
+}
+class MCAStudent extends Student {
+
+    MCAStudent(int id, String name, String dept) {
+        super(id, name, dept);
+    }
+
+    @Override
+    public void display() {
+        System.out.println("MCA Student Details:");
+        super.display();
+    }
+}
+class StatusThread extends Thread {
+    public void run() {
+        System.out.println("Generating report...");
+    }
+}
+class SaveThread extends Thread {
+    String data;
+
+    SaveThread(String data) {
+        this.data = data;
+    }
+
+    public void run() {
+        try {
+            java.io.FileWriter fw = new java.io.FileWriter("student.txt");
+            fw.write(data);
+            fw.close();
+            System.out.println("File saved successfully.");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+}
+public class MainApp {
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        try {
+            
+            System.out.print("Enter Student ID: ");
+            int id = sc.nextInt();
+            sc.nextLine(); 
+
+            System.out.print("Enter Name: ");
+            String name = sc.nextLine();
+
+            System.out.print("Enter Department: ");
+            String dept = sc.nextLine();
+
+           
+            Student s1 = new MCAStudent(id, name, dept);
+
+            
+            System.out.print("Enter number of subjects (3 or 5): ");
+            int choice = sc.nextInt();
+
+            int total = 0;
+
+            if (choice == 3) {
+                System.out.print("Enter 3 marks: ");
+                int m1 = sc.nextInt();
+                int m2 = sc.nextInt();
+                int m3 = sc.nextInt();
+
+                if (m1 < 0 || m2 < 0 || m3 < 0)
+                    throw new InvalidMarkException("Marks cannot be negative");
+
+                total = s1.calculateTotal(m1, m2, m3);
+
+            } else if (choice == 5) {
+                System.out.print("Enter 5 marks: ");
+                int m1 = sc.nextInt();
+                int m2 = sc.nextInt();
+                int m3 = sc.nextInt();
+                int m4 = sc.nextInt();
+                int m5 = sc.nextInt();
+
+                if (m1 < 0 || m2 < 0 || m3 < 0 || m4 < 0 || m5 < 0)
+                    throw new InvalidMarkException("Marks cannot be negative");
+
+                total = s1.calculateTotal(m1, m2, m3, m4, m5);
+            } else {
+                System.out.println("Invalid choice");
+                return;
+            }
+
+           
+            Student.Result r = s1.new Result();
+            r.calculateResult();
+
+            
+            s1.display();
+
+            String report = "Student Report\n"
+                    + "Total: " + total + "\n"
+                    + r.getResult();
+
+            System.out.println(report);
+
+           
+            StatusThread t1 = new StatusThread();
+            SaveThread t2 = new SaveThread(report);
+
+            t1.start();
+            t2.start();
+
+        } catch (InvalidMarkException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+}
