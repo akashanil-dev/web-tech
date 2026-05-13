@@ -1,0 +1,671 @@
+// 3 – Hospital Patient Monitoring System
+import java.util.Scanner;
+abstract class HospitalMember {
+    String name;
+    abstract void display();
+}
+class InvalidDataException extends Exception {
+    public InvalidDataException(String msg) {
+        super(msg);
+    }
+}
+class Patient extends HospitalMember {
+    private int id;
+    protected int age;
+    String disease;
+    double bill;
+
+    Patient() {}
+
+    Patient(int id, String name, int age, String disease) throws InvalidDataException {
+        if (age <= 0) throw new InvalidDataException("Invalid Age");
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.disease = disease;
+    }
+
+    double calculateBill(double consultation) {
+        bill = consultation;
+        return bill;
+    }
+
+    double calculateBill(double consultation, double medicine) {
+        bill = consultation + medicine;
+        return bill;
+    }
+
+    class MedicalReport {
+        String report;
+
+        void generate() {
+            report = "Patient: " + name + ", Disease: " + disease + ", Bill: " + bill;
+        }
+
+        String getReport() {
+            return report;
+        }
+    }
+
+    public void display() {
+        System.out.println("ID: " + id + ", Name: " + name + ", Age: " + age + ", Disease: " + disease);
+    }
+}
+class InPatient extends Patient {
+
+    InPatient(int id, String name, int age, String disease) throws InvalidDataException {
+        super(id, name, age, disease);
+    }
+
+    @Override
+    double calculateBill(double consultation, double medicine) {
+        double roomCharge = 500;
+        bill = consultation + medicine + roomCharge;
+        return bill;
+    }
+}
+class BillThread extends Thread {
+    String data;
+
+    BillThread(String data) {
+        this.data = data;
+    }
+
+    public void run() {
+        System.out.println("Generating Bill...");
+        try {
+            java.io.FileWriter fw = new java.io.FileWriter("patients.txt", true);
+            fw.write(data + "\n");
+            fw.close();
+            System.out.println("Bill saved to file.");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+}
+class MonitorThread extends Thread {
+    public void run() {
+        System.out.println("Monitoring patient...");
+    }
+}
+public class MainApp {
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        try {
+            System.out.print("Enter Patient ID: ");
+            int id = sc.nextInt();
+            sc.nextLine();
+
+            System.out.print("Enter Name: ");
+            String name = sc.nextLine();
+
+            System.out.print("Enter Age: ");
+            int age = sc.nextInt();
+            sc.nextLine();
+
+            System.out.print("Enter Disease: ");
+            String disease = sc.nextLine();
+
+            System.out.print("Type (1-OutPatient, 2-InPatient): ");
+            int type = sc.nextInt();
+
+            Patient p;
+
+            if (type == 2)
+                p = new InPatient(id, name, age, disease);
+            else
+                p = new Patient(id, name, age, disease);
+
+            System.out.print("Enter Consultation Fee: ");
+            double c = sc.nextDouble();
+
+            System.out.print("Add Medicine? (1-Yes, 0-No): ");
+            int choice = sc.nextInt();
+
+            double total;
+
+            if (choice == 1) {
+                System.out.print("Enter Medicine Cost: ");
+                double m = sc.nextDouble();
+                total = p.calculateBill(c, m);
+            } else {
+                total = p.calculateBill(c);
+            }
+
+            if (total < 0) throw new InvalidDataException("Invalid Bill");
+
+            Patient.MedicalReport mr = p.new MedicalReport();
+            mr.generate();
+
+            p.display();
+            System.out.println("Prescription: " + mr.getReport());
+
+            BillThread t1 = new BillThread(mr.getReport());
+            MonitorThread t2 = new MonitorThread();
+
+            t1.start();
+            t2.start();
+
+        } catch (InvalidDataException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+// 4 – Employee Payroll Processing System
+import java.util.Scanner;
+abstract class Staff {
+    String name;
+    abstract void display();
+}
+class InvalidSalaryException extends Exception {
+    public InvalidSalaryException(String msg) {
+        super(msg);
+    }
+}
+class Employee extends Staff {
+    private int empId;
+    protected String designation;
+    protected double basicSalary;
+    double totalSalary;
+
+    Employee() {}
+
+    Employee(int id, String name, String desig, double salary) throws InvalidSalaryException {
+        if (salary < 0) throw new InvalidSalaryException("Invalid Salary");
+        this.empId = id;
+        this.name = name;
+        this.designation = desig;
+        this.basicSalary = salary;
+    }
+
+    double calculateSalary(double bonus) {
+        totalSalary = basicSalary + bonus;
+        return totalSalary;
+    }
+
+    double calculateSalary(double bonus, double overtime) {
+        totalSalary = basicSalary + bonus + overtime;
+        return totalSalary;
+    }
+
+    class Payroll {
+        String slip;
+
+        void generateSlip() {
+            slip = "Employee: " + name + 
+                   ", Designation: " + designation + 
+                   ", Salary: " + totalSalary;
+        }
+
+        String getSlip() {
+            return slip;
+        }
+    }
+
+    public void display() {
+        System.out.println("ID: " + empId + ", Name: " + name + ", Designation: " + designation);
+    }
+}
+class Manager extends Employee {
+
+    Manager(int id, String name, String desig, double salary) throws InvalidSalaryException {
+        super(id, name, desig, salary);
+    }
+
+    @Override
+    double calculateSalary(double bonus, double overtime) {
+        double extra = 1000; 
+        totalSalary = basicSalary + bonus + overtime + extra;
+        return totalSalary;
+    }
+}
+class Developer extends Employee {
+
+    Developer(int id, String name, String desig, double salary) throws InvalidSalaryException {
+        super(id, name, desig, salary);
+    }
+
+    @Override
+    double calculateSalary(double bonus, double overtime) {
+        double extra = 500; 
+        totalSalary = basicSalary + bonus + overtime + extra;
+        return totalSalary;
+    }
+}
+class SalaryThread extends Thread {
+    public void run() {
+        System.out.println("Processing salary...");
+    }
+}
+class ReportThread extends Thread {
+    String data;
+
+    ReportThread(String data) {
+        this.data = data;
+    }
+
+    public void run() {
+        try {
+            java.io.FileWriter fw = new java.io.FileWriter("payroll.txt", true);
+            fw.write(data + "\n");
+            fw.close();
+            System.out.println("Report saved.");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+}
+public class MainApp {
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        try {
+            System.out.print("Enter Employee ID: ");
+            int id = sc.nextInt();
+            sc.nextLine();
+
+            System.out.print("Enter Name: ");
+            String name = sc.nextLine();
+
+            System.out.print("Enter Designation: ");
+            String desig = sc.nextLine();
+
+            System.out.print("Enter Basic Salary: ");
+            double salary = sc.nextDouble();
+
+            System.out.print("Type (1-Manager, 2-Developer): ");
+            int type = sc.nextInt();
+
+            Employee emp;
+
+            if (type == 1)
+                emp = new Manager(id, name, desig, salary);
+            else
+                emp = new Developer(id, name, desig, salary);
+
+            System.out.print("Enter Bonus: ");
+            double bonus = sc.nextDouble();
+
+            System.out.print("Enter Overtime: ");
+            double overtime = sc.nextDouble();
+
+            double total = emp.calculateSalary(bonus, overtime);
+
+            if (total < 0) throw new InvalidSalaryException("Invalid Total Salary");
+
+            Employee.Payroll p = emp.new Payroll();
+            p.generateSlip();
+
+            emp.display();
+            System.out.println("Salary Slip: " + p.getSlip());
+
+            SalaryThread t1 = new SalaryThread();
+            ReportThread t2 = new ReportThread(p.getSlip());
+
+            t1.start();
+            t2.start();
+
+        } catch (InvalidSalaryException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+}
+
+
+
+
+
+
+
+
+// 5 – Library Book Management System
+import java.util.Scanner;
+abstract class LibraryItem {
+    String title;
+    abstract void display();
+}
+class InvalidIssueException extends Exception {
+    public InvalidIssueException(String msg) {
+        super(msg);
+    }
+}
+class Book extends LibraryItem {
+    private int bookId;
+    protected String author;
+    boolean available = true;
+
+    Book() {}
+
+    Book(int id, String title, String author) {
+        this.bookId = id;
+        this.title = title;
+        this.author = author;
+    }
+
+    void search(String title) {
+        if (this.title.equalsIgnoreCase(title))
+            System.out.println("Book Found by Title: " + title);
+    }
+
+    void searchByAuthor(String author) {
+        if (this.author.equalsIgnoreCase(author))
+            System.out.println("Book Found by Author: " + author);
+    }
+
+    void issueBook() throws InvalidIssueException {
+        if (!available)
+            throw new InvalidIssueException("Book already issued");
+        available = false;
+    }
+
+    void returnBook() {
+        available = true;
+    }
+
+    static class LibraryRules {
+        static void showRules() {
+            System.out.println("Rule: Return book within 7 days.");
+        }
+    }
+
+    public void display() {
+        System.out.println("ID: " + bookId + ", Title: " + title + ", Author: " + author);
+    }
+}
+class PrintedBook extends Book {
+
+    PrintedBook(int id, String title, String author) {
+        super(id, title, author);
+    }
+
+    @Override
+    public void display() {
+        System.out.println("Printed Book:");
+        super.display();
+    }
+}
+class DigitalBook extends Book {
+
+    DigitalBook(int id, String title, String author) {
+        super(id, title, author);
+    }
+
+    @Override
+    public void display() {
+        System.out.println("Digital Book:");
+        super.display();
+    }
+}
+class IssueThread extends Thread {
+    String data;
+
+    IssueThread(String data) {
+        this.data = data;
+    }
+
+    public void run() {
+        System.out.println("Processing Issue...");
+        try {
+            java.io.FileWriter fw = new java.io.FileWriter("library.txt", true);
+            fw.write(data + "\n");
+            fw.close();
+            System.out.println("Issue saved to file.");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+}
+class ReturnThread extends Thread {
+    public void run() {
+        System.out.println("Processing Return...");
+    }
+}
+public class MainApp {
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        try {
+            Book[] books = new Book[2];
+
+            for (int i = 0; i < 2; i++) {
+                System.out.print("Enter Book ID: ");
+                int id = sc.nextInt();
+                sc.nextLine();
+
+                System.out.print("Enter Title: ");
+                String title = sc.nextLine();
+
+                System.out.print("Enter Author: ");
+                String author = sc.nextLine();
+
+                System.out.print("Type (1-Printed, 2-Digital): ");
+                int type = sc.nextInt();
+
+                if (type == 1)
+                    books[i] = new PrintedBook(id, title, author);
+                else
+                    books[i] = new DigitalBook(id, title, author);
+            }
+
+            sc.nextLine();
+            System.out.print("Search by title: ");
+            String searchTitle = sc.nextLine();
+
+            for (Book b : books)
+                b.search(searchTitle);
+
+            books[0].issueBook();
+
+            String report = "Issued Book: " + books[0].title;
+
+            books[0].display();
+
+            Book.LibraryRules.showRules();
+
+            IssueThread t1 = new IssueThread(report);
+            ReturnThread t2 = new ReturnThread();
+
+            t1.start();
+            t2.start();
+
+        } catch (InvalidIssueException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+// 6 – Online Food Delivery System
+import java.util.Scanner;
+abstract class Order {
+    String customerName;
+    abstract void display();
+}
+class InvalidQuantityException extends Exception {
+    public InvalidQuantityException(String msg) {
+        super(msg);
+    }
+}
+class FoodOrder extends Order {
+    private int orderId;
+    protected String foodItem;
+    int quantity;
+    double total;
+
+    FoodOrder() {}
+
+    FoodOrder(int id, String name, String item, int qty) throws InvalidQuantityException {
+        if (qty <= 0) throw new InvalidQuantityException("Invalid Quantity");
+        this.orderId = id;
+        this.customerName = name;
+        this.foodItem = item;
+        this.quantity = qty;
+    }
+
+    double calculateBill(double price) {
+        total = price * quantity;
+        return total;
+    }
+
+    double calculateBill(double price, double deliveryCharge) {
+        total = (price * quantity) + deliveryCharge;
+        return total;
+    }
+
+    class BillDetails {
+        String invoice;
+
+        void generate() {
+            invoice = "Customer: " + customerName +
+                      ", Item: " + foodItem +
+                      ", Qty: " + quantity +
+                      ", Total: " + total;
+        }
+
+        String getInvoice() {
+            return invoice;
+        }
+    }
+
+    public void display() {
+        System.out.println("OrderID: " + orderId + ", Name: " + customerName);
+    }
+}
+class VegOrder extends FoodOrder {
+
+    VegOrder(int id, String name, String item, int qty) throws InvalidQuantityException {
+        super(id, name, item, qty);
+    }
+
+    @Override
+    double calculateBill(double price, double deliveryCharge) {
+        double discount = 20;
+        total = (price * quantity) + deliveryCharge - discount;
+        return total;
+    }
+}
+class NonVegOrder extends FoodOrder {
+
+    NonVegOrder(int id, String name, String item, int qty) throws InvalidQuantityException {
+        super(id, name, item, qty);
+    }
+
+    @Override
+    double calculateBill(double price, double deliveryCharge) {
+        double extra = 30;
+        total = (price * quantity) + deliveryCharge + extra;
+        return total;
+    }
+}
+class CookingThread extends Thread {
+    public void run() {
+        System.out.println("Cooking in progress...");
+    }
+}
+class DeliveryThread extends Thread {
+    String data;
+
+    DeliveryThread(String data) {
+        this.data = data;
+    }
+
+    public void run() {
+        try {
+            java.io.FileWriter fw = new java.io.FileWriter("orders.txt", true);
+            fw.write(data + "\n");
+            fw.close();
+            System.out.println("Order saved & out for delivery.");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+}
+public class MainApp {
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        try {
+            FoodOrder[] orders = new FoodOrder[2];
+
+            for (int i = 0; i < 2; i++) {
+                System.out.print("Enter Order ID: ");
+                int id = sc.nextInt();
+                sc.nextLine();
+
+                System.out.print("Enter Customer Name: ");
+                String name = sc.nextLine();
+
+                System.out.print("Enter Food Item: ");
+                String item = sc.nextLine();
+
+                System.out.print("Enter Quantity: ");
+                int qty = sc.nextInt();
+
+                System.out.print("Type (1-Veg, 2-NonVeg): ");
+                int type = sc.nextInt();
+
+                if (type == 1)
+                    orders[i] = new VegOrder(id, name, item, qty);
+                else
+                    orders[i] = new NonVegOrder(id, name, item, qty);
+            }
+
+            System.out.print("Select order index (0 or 1): ");
+            int index = sc.nextInt();
+
+            FoodOrder o = orders[index];
+
+            System.out.print("Enter price per item: ");
+            double price = sc.nextDouble();
+
+            System.out.print("Delivery type (1-Normal, 2-Express): ");
+            int d = sc.nextInt();
+
+            double total;
+
+            if (d == 1)
+                total = o.calculateBill(price);
+            else
+                total = o.calculateBill(price, 50); 
+
+            FoodOrder.BillDetails b = o.new BillDetails();
+            b.generate();
+
+            o.display();
+            System.out.println("Invoice: " + b.getInvoice());
+
+            CookingThread t1 = new CookingThread();
+            DeliveryThread t2 = new DeliveryThread(b.getInvoice());
+
+            t1.start();
+            t2.start();
+
+        } catch (InvalidQuantityException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+}
