@@ -1,189 +1,246 @@
-1 – Smart Student Record Management System
-import java.util.Scanner;
-abstract class Person {
-    protected String name;
+//XML-CRUD
 
-    abstract void display();
-}
-class InvalidMarkException extends Exception {
-    public InvalidMarkException(String msg) {
-        super(msg);
-    }
-}
-class Student extends Person {
-    private int studentId;
-    protected String department;
-    private int total;
+<?xml version="1.0" encoding="utf-8"?>
 
-    
-    Student() {
-        studentId = 0;
-        name = "Unknown";
-        department = "None";
-    }
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
 
-   
-    Student(int id, String name, String dept) {
-        this.studentId = id;
-        this.name = name;
-        this.department = dept;
-    }
 
-   
-    int calculateTotal(int m1, int m2, int m3) {
-        total = m1 + m2 + m3;
-        return total;
-    }
 
-    int calculateTotal(int m1, int m2, int m3, int m4, int m5) {
-        total = m1 + m2 + m3 + m4 + m5;
-        return total;
-    }
+    <EditText
+        android:id="@+id/edit_rollno"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Roll Number"
+        android:inputType="number" />
 
-    
-    class Result {
-        String grade;
-        String status;
+    <EditText
+        android:id="@+id/edit_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Name" />
 
-        void calculateResult() {
-            if (total >= 250) {
-                grade = "A";
-                status = "Pass";
-            } else if (total >= 150) {
-                grade = "B";
-                status = "Pass";
-            } else {
-                grade = "C";
-                status = "Fail";
-            }
-        }
+    <EditText
+        android:id="@+id/edit_phno"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Phone Number"
+        android:inputType="phone" />
 
-        String getResult() {
-            return "Grade: " + grade + ", Status: " + status;
-        }
-    }
+    <Button
+        android:id="@+id/btn_insert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Insert" />
 
-   
+    <Button
+        android:id="@+id/btn_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Update" />
+
+    <Button
+        android:id="@+id/btn_delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete" />
+
+    <Button
+        android:id="@+id/btn_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="View Data" />
+
+    <TextView
+        android:id="@+id/text_data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:paddingTop="20dp" />
+
+</LinearLayout>
+
+
+
+
+
+
+
+
+// MainActivity
+package com.example.crudeve;
+import android.database.Cursor;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText edit_rollno, edit_name, edit_phno;
+    Button btn_insert, btn_update, btn_delete, btn_view;
+    TextView text_data;
+    DBhelper dbHelper;
+
     @Override
-    public void display() {
-        System.out.println("ID: " + studentId + ", Name: " + name + ", Dept: " + department);
-    }
+    protected void onCreate(Bundle savedInstanceState) {
 
-    public int getTotal() {
-        return total;
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        edit_rollno = findViewById(R.id.edit_rollno);
+        edit_name = findViewById(R.id.edit_name);
+        edit_phno = findViewById(R.id.edit_phno);
+
+        btn_insert = findViewById(R.id.btn_insert);
+        btn_update = findViewById(R.id.btn_update);
+        btn_delete = findViewById(R.id.btn_delete);
+        btn_view = findViewById(R.id.btn_view);
+
+        text_data = findViewById(R.id.text_data);
+
+        dbHelper = new DBhelper(this);
+
+        // INSERT
+        btn_insert.setOnClickListener(v -> {
+            int roll = Integer.parseInt(edit_rollno.getText().toString());
+            String name = edit_name.getText().toString();
+            String phone = edit_phno.getText().toString();
+            boolean result = dbHelper.insertData(roll, name, phone);
+            if (result) {
+                Toast.makeText(this, "Inserted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // UPDATE
+        btn_update.setOnClickListener(v -> {
+            int roll = Integer.parseInt(edit_rollno.getText().toString());
+            String name = edit_name.getText().toString();
+            String phone = edit_phno.getText().toString();
+            boolean result = dbHelper.updateData(roll, name, phone);
+            if (result) {
+                Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Update Failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // DELETE
+        btn_delete.setOnClickListener(v -> {
+            int roll = Integer.parseInt(edit_rollno.getText().toString());
+            boolean result = dbHelper.deleteData(roll);
+            if (result) {
+                Toast.makeText(this, "Deleted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Delete Failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // VIEW
+        btn_view.setOnClickListener(v -> {
+            Cursor cursor = dbHelper.viewData();
+            String data = "";
+            while (cursor.moveToNext()) {
+                data += "Roll No : " + cursor.getInt(0) + "\n";
+                data += "Name : " + cursor.getString(1) + "\n";
+                data += "Phone : " + cursor.getString(2) + "\n\n";
+            }
+            text_data.setText(data);
+        });
     }
 }
-class MCAStudent extends Student {
 
-    MCAStudent(int id, String name, String dept) {
-        super(id, name, dept);
+
+
+
+
+
+
+// DBhelper
+package com.example.crudeve;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class DBhelper extends SQLiteOpenHelper {
+
+    public DBhelper(Context context) {
+        super(context, "student_db", null, 1);
     }
 
     @Override
-    public void display() {
-        System.out.println("MCA Student Details:");
-        super.display();
+    public void onCreate(SQLiteDatabase db) {
+
+        db.execSQL(
+                "CREATE TABLE students(" +
+                        "roll_no INTEGER PRIMARY KEY," +
+                        "name TEXT," +
+                        "phone TEXT)"
+        );
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+    }
+
+    // INSERT
+    public boolean insertData(int roll, String name, String phone) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put("roll_no", roll);
+        values.put("name", name);
+        values.put("phone", phone);
+
+        long result = db.insert("students", null, values);
+
+        return result != -1;
+    }
+
+    // UPDATE
+    public boolean updateData(int roll, String name, String phone) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put("name", name);
+        values.put("phone", phone);
+
+        int result = db.update(
+                "students",
+                values,
+                "roll_no=?",
+                new String[]{String.valueOf(roll)}
+        );
+        return result > 0;
+    }
+
+    // DELETE
+    public boolean deleteData(int roll) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int result = db.delete(
+                "students",
+                "roll_no=?",
+                new String[]{String.valueOf(roll)}
+        );
+        return result > 0;
+    }
+
+    // VIEW
+    public Cursor viewData() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM students", null);
     }
 }
-class StatusThread extends Thread {
-    public void run() {
-        System.out.println("Generating report...");
-    }
-}
-class SaveThread extends Thread {
-    String data;
 
-    SaveThread(String data) {
-        this.data = data;
-    }
-
-    public void run() {
-        try {
-            java.io.FileWriter fw = new java.io.FileWriter("student.txt");
-            fw.write(data);
-            fw.close();
-            System.out.println("File saved successfully.");
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
-}
-public class MainApp {
-    public static void main(String[] args) {
-
-        Scanner sc = new Scanner(System.in);
-
-        try {
-            
-            System.out.print("Enter Student ID: ");
-            int id = sc.nextInt();
-            sc.nextLine(); 
-
-            System.out.print("Enter Name: ");
-            String name = sc.nextLine();
-
-            System.out.print("Enter Department: ");
-            String dept = sc.nextLine();
-
-           
-            Student s1 = new MCAStudent(id, name, dept);
-
-            
-            System.out.print("Enter number of subjects (3 or 5): ");
-            int choice = sc.nextInt();
-
-            int total = 0;
-
-            if (choice == 3) {
-                System.out.print("Enter 3 marks: ");
-                int m1 = sc.nextInt();
-                int m2 = sc.nextInt();
-                int m3 = sc.nextInt();
-
-                if (m1 < 0 || m2 < 0 || m3 < 0)
-                    throw new InvalidMarkException("Marks cannot be negative");
-
-                total = s1.calculateTotal(m1, m2, m3);
-
-            } else if (choice == 5) {
-                System.out.print("Enter 5 marks: ");
-                int m1 = sc.nextInt();
-                int m2 = sc.nextInt();
-                int m3 = sc.nextInt();
-                int m4 = sc.nextInt();
-                int m5 = sc.nextInt();
-
-                if (m1 < 0 || m2 < 0 || m3 < 0 || m4 < 0 || m5 < 0)
-                    throw new InvalidMarkException("Marks cannot be negative");
-
-                total = s1.calculateTotal(m1, m2, m3, m4, m5);
-            } else {
-                System.out.println("Invalid choice");
-                return;
-            }
-
-           
-            Student.Result r = s1.new Result();
-            r.calculateResult();
-
-            
-            s1.display();
-
-            String report = "Student Report\n"
-                    + "Total: " + total + "\n"
-                    + r.getResult();
-
-            System.out.println(report);
-
-           
-            StatusThread t1 = new StatusThread();
-            SaveThread t2 = new SaveThread(report);
-
-            t1.start();
-            t2.start();
-
-        } catch (InvalidMarkException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-}
