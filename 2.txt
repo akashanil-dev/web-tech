@@ -1,86 +1,64 @@
 @echo off
-setlocal
+setlocal EnableDelayedExpansion
 
-:: ================================
+:: =====================================
 :: Configuration
-:: ================================
+:: =====================================
 set "URL=http://129.159.228.210:8000"
 set "USERNAME=the_user"
 
-:: IMPORTANT:
-:: Every % sign inside batch files must become %%
+:: Escape % signs as %%
 set "PASSWORD=jj7*7hggfFHghjtGJh%%GhfgfjyFJH%%456"
 
 echo Logging in...
 echo.
 
-:: ================================
-:: Login and get token
-:: ================================
+:: =====================================
+:: Login
+:: =====================================
 curl -s -X POST "%URL%/login" ^
 -H "Content-Type: application/json" ^
 -d "{\"username\":\"%USERNAME%\",\"password\":\"%PASSWORD%\"}" > login.json
 
-:: ================================
-:: Extract token
-:: ================================
-set TOKEN=
-
-for /f "tokens=2 delims=:,}" %%a in ('findstr "access_token" login.json') do (
-    set TOKEN=%%a
+:: Use PowerShell to extract token properly
+for /f "delims=" %%a in ('
+    powershell -Command ^
+    "(Get-Content login.json | ConvertFrom-Json).access_token"
+') do (
+    set "TOKEN=%%a"
 )
 
-:: Remove quotes and spaces
-set TOKEN=%TOKEN:"=%
-set TOKEN=%TOKEN: =%
-
-:: ================================
-:: Login failed check
-:: ================================
-if "%TOKEN%"=="" (
+if "!TOKEN!"=="" (
     echo Login failed.
     echo.
-    echo Possible reasons:
-    echo - Server is offline
-    echo - Wrong IP address
-    echo - Wrong username/password
-    echo - curl is missing
-    echo.
-
     type login.json
     echo.
-
     pause
     exit /b
 )
 
-echo Connected successfully.
-echo.
-echo Commands:
-echo   /clear   - Clear chat history
-echo   exit     - Quit
+echo Connected! Type your message. Commands: /clear, exit
 echo.
 
-:: ================================
-:: Main chat loop
-:: ================================
+:: =====================================
+:: Chat Loop
+:: =====================================
 :loop
 
 set "USER_INPUT="
-set /p USER_INPUT=You ^> 
+set /p USER_INPUT=You: 
 
-:: Exit command
-if /I "%USER_INPUT%"=="exit" (
+if /I "!USER_INPUT!"=="exit" (
     goto end
 )
 
-:: ================================
+:: =====================================
 :: Clear history
-:: ================================
-if /I "%USER_INPUT%"=="/clear" (
+:: =====================================
+if /I "!USER_INPUT!"=="/clear" (
 
     curl -s -X POST "%URL%/clear" ^
-    -H "Authorization: Bearer %TOKEN%" > nul
+    -H "Authorization: Bearer !TOKEN!" > nul
 
     echo.
     echo AI  ^> [History Cleared]
@@ -89,37 +67,30 @@ if /I "%USER_INPUT%"=="/clear" (
     goto loop
 )
 
-:: ================================
+:: =====================================
 :: Send message
-:: ================================
+:: =====================================
 curl -s -X POST "%URL%/chat" ^
--H "Authorization: Bearer %TOKEN%" ^
+-H "Authorization: Bearer !TOKEN!" ^
 -H "Content-Type: application/json" ^
--d "{\"message\":\"%USER_INPUT%\"}" > response.json
+-d "{\"message\":\"!USER_INPUT!\"}" > response.json
 
-:: ================================
-:: Extract AI reply
-:: ================================
-set REPLY=
-
-for /f "tokens=2 delims=:}" %%a in ('findstr "reply" response.json') do (
-    set REPLY=%%a
-)
-
-:: Cleanup formatting
-set REPLY=%REPLY:"=%
-set REPLY=%REPLY:\n=%
-set REPLY=%REPLY:~1%
-
+:: =====================================
+:: Display AI reply properly
+:: =====================================
 echo.
-echo AI  ^> %REPLY%
+echo AI  ^>
 echo.
 
+powershell -Command ^
+"$r = Get-Content response.json -Raw | ConvertFrom-Json; Write-Output $r.reply"
+
+echo.
 goto loop
 
-:: ================================
-:: Exit cleanup
-:: ================================
+:: =====================================
+:: Cleanup
+:: =====================================
 :end
 
 if exist login.json del login.json
