@@ -6,7 +6,10 @@ setlocal
 :: ================================
 set "URL=http://129.159.228.210:8000"
 set "USERNAME=the_user"
-set "PASSWORD=jj7*7hggfFHghjtGJh%GhfgfjyFJH%%456"
+
+:: IMPORTANT:
+:: Every % sign inside batch files must become %%
+set "PASSWORD=jj7*7hggfFHghjtGJh%%GhfgfjyFJH%%456"
 
 echo Logging in...
 echo.
@@ -18,34 +21,55 @@ curl -s -X POST "%URL%/login" ^
 -H "Content-Type: application/json" ^
 -d "{\"username\":\"%USERNAME%\",\"password\":\"%PASSWORD%\"}" > login.json
 
-:: Extract token safely
+:: ================================
+:: Extract token
+:: ================================
+set TOKEN=
+
 for /f "tokens=2 delims=:,}" %%a in ('findstr "access_token" login.json') do (
     set TOKEN=%%a
 )
 
-:: Remove quotes/spaces
+:: Remove quotes and spaces
 set TOKEN=%TOKEN:"=%
 set TOKEN=%TOKEN: =%
 
+:: ================================
+:: Login failed check
+:: ================================
 if "%TOKEN%"=="" (
     echo Login failed.
-    echo Check:
-    echo - Server is running
-    echo - IP address is correct
-    echo - Credentials are correct
+    echo.
+    echo Possible reasons:
+    echo - Server is offline
+    echo - Wrong IP address
+    echo - Wrong username/password
+    echo - curl is missing
+    echo.
+
+    type login.json
+    echo.
+
     pause
     exit /b
 )
 
 echo Connected successfully.
-echo Type /clear to reset history
-echo Type exit to quit
+echo.
+echo Commands:
+echo   /clear   - Clear chat history
+echo   exit     - Quit
 echo.
 
+:: ================================
+:: Main chat loop
+:: ================================
 :loop
 
+set "USER_INPUT="
 set /p USER_INPUT=You ^> 
 
+:: Exit command
 if /I "%USER_INPUT%"=="exit" (
     goto end
 )
@@ -61,11 +85,12 @@ if /I "%USER_INPUT%"=="/clear" (
     echo.
     echo AI  ^> [History Cleared]
     echo.
+
     goto loop
 )
 
 :: ================================
-:: Send chat request
+:: Send message
 :: ================================
 curl -s -X POST "%URL%/chat" ^
 -H "Authorization: Bearer %TOKEN%" ^
@@ -81,7 +106,7 @@ for /f "tokens=2 delims=:}" %%a in ('findstr "reply" response.json') do (
     set REPLY=%%a
 )
 
-:: Clean output
+:: Cleanup formatting
 set REPLY=%REPLY:"=%
 set REPLY=%REPLY:\n=%
 set REPLY=%REPLY:~1%
@@ -92,9 +117,14 @@ echo.
 
 goto loop
 
+:: ================================
+:: Exit cleanup
+:: ================================
 :end
-del login.json >nul 2>&1
-del response.json >nul 2>&1
 
+if exist login.json del login.json
+if exist response.json del response.json
+
+echo.
 echo Goodbye.
 pause
