@@ -1,53 +1,100 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal
 
-:: Configuration - Update with your Oracle Server IP
-set URL=http://129.159.228.210:8000
-set USERNAME=the_user
-set PASSWORD=jj7*7hggfFHghjtGJh%GhfgfjyFJH%456
+:: ================================
+:: Configuration
+:: ================================
+set "URL=http://129.159.228.210:8000"
+set "USERNAME=the_user"
+set "PASSWORD=jj7*7hggfFHghjtGJh%GhfgfjyFJH%%456"
 
 echo Logging in...
+echo.
 
-:: 1. Login to get Token (Using curl and a bit of batch magic to parse JSON)
-for /f "tokens=2 delims=:, " %%a in ('curl -s -X POST %URL%/login -H "Content-Type: application/json" -d "{\"username\":\"%USERNAME%\",\"password\":\"%PASSWORD%\"}"') do (
+:: ================================
+:: Login and get token
+:: ================================
+curl -s -X POST "%URL%/login" ^
+-H "Content-Type: application/json" ^
+-d "{\"username\":\"%USERNAME%\",\"password\":\"%PASSWORD%\"}" > login.json
+
+:: Extract token safely
+for /f "tokens=2 delims=:,}" %%a in ('findstr "access_token" login.json') do (
     set TOKEN=%%a
 )
 
-:: Clean the token (remove quotes)
+:: Remove quotes/spaces
 set TOKEN=%TOKEN:"=%
-set TOKEN=%TOKEN:} =%
+set TOKEN=%TOKEN: =%
 
 if "%TOKEN%"=="" (
-    echo Login failed! Check your server IP or credentials.
+    echo Login failed.
+    echo Check:
+    echo - Server is running
+    echo - IP address is correct
+    echo - Credentials are correct
     pause
     exit /b
 )
 
-echo Connected! Type your message. 
-echo Type /clear to reset history, or Ctrl+C to quit.
+echo Connected successfully.
+echo Type /clear to reset history
+echo Type exit to quit
 echo.
 
 :loop
-set /p USER_INPUT="You > "
 
-:: Check for /clear command
-if "!USER_INPUT!"=="/clear" (
-    curl -s -X POST %URL%/clear -H "Authorization: Bearer %TOKEN%" > nul
+set /p USER_INPUT=You ^> 
+
+if /I "%USER_INPUT%"=="exit" (
+    goto end
+)
+
+:: ================================
+:: Clear history
+:: ================================
+if /I "%USER_INPUT%"=="/clear" (
+
+    curl -s -X POST "%URL%/clear" ^
+    -H "Authorization: Bearer %TOKEN%" > nul
+
+    echo.
     echo AI  ^> [History Cleared]
     echo.
     goto loop
 )
 
-:: 2. Send Chat Request
-:: Note: We use a temp file because CMD struggles with complex JSON characters in strings
-curl -s -X POST %URL%/chat ^
-     -H "Authorization: Bearer %TOKEN%" ^
-     -H "Content-Type: application/json" ^
-     -d "{\"message\":\"!USER_INPUT!\"}" > response.json
+:: ================================
+:: Send chat request
+:: ================================
+curl -s -X POST "%URL%/chat" ^
+-H "Authorization: Bearer %TOKEN%" ^
+-H "Content-Type: application/json" ^
+-d "{\"message\":\"%USER_INPUT%\"}" > response.json
 
-:: Simple way to show the reply from the JSON file
-echo AI  ^> 
-type response.json | findstr /v "{" | findstr /v "}"
+:: ================================
+:: Extract AI reply
+:: ================================
+set REPLY=
+
+for /f "tokens=2 delims=:}" %%a in ('findstr "reply" response.json') do (
+    set REPLY=%%a
+)
+
+:: Clean output
+set REPLY=%REPLY:"=%
+set REPLY=%REPLY:\n=%
+set REPLY=%REPLY:~1%
+
+echo.
+echo AI  ^> %REPLY%
 echo.
 
 goto loop
+
+:end
+del login.json >nul 2>&1
+del response.json >nul 2>&1
+
+echo Goodbye.
+pause
