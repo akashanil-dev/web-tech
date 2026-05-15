@@ -1,0 +1,39 @@
+$URL = "http://129.159.228.210:8000"
+$Username = "the_user"
+$Password = "jj7*7hggfFHghjtGJh%GhfgfjyFJH%456"
+
+Write-Host "Logging in..." -ForegroundColor Cyan
+
+# 1. Login to get Token
+$LoginBody = @{ username = $Username; password = $Password } | ConvertTo-Json
+try {
+    $LoginResponse = Invoke-RestMethod -Method Post -Uri "$URL/login" -ContentType "application/json" -Body $LoginBody
+    $Token = $LoginResponse.access_token
+} catch {
+    Write-Host "Login failed! Check your server IP or credentials." -ForegroundColor Red
+    exit
+}
+
+Write-Host "Connected! Type your message. Commands: /clear (reset history), exit (quit)" -ForegroundColor Green
+
+# 2. Interactive Loop
+while ($true) {
+    $userInput = Read-Host "You"
+    
+    if ($userInput -eq "exit") { break }
+
+    if ($userInput -eq "/clear") {
+        Invoke-RestMethod -Method Post -Uri "$URL/clear" -Headers @{ Authorization = "Bearer $Token" }
+        Write-Host "AI  > [History Cleared]" -ForegroundColor Yellow
+        continue
+    }
+
+    # Send message to AI
+    $ChatBody = @{ message = $userInput } | ConvertTo-Json
+    try {
+        $ChatResponse = Invoke-RestMethod -Method Post -Uri "$URL/chat" -Headers @{ Authorization = "Bearer $Token" } -ContentType "application/json" -Body $ChatBody
+        Write-Host "AI  > $($ChatResponse.reply)`n" -ForegroundColor Cyan
+    } catch {
+        Write-Host "AI  > Error connecting to server.`n" -ForegroundColor Red
+    }
+}
